@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
+    
+    <!--media-->
+    
+<!--    <bean id="media" class="caja.jcastulo.media.audio.AudioMedia">
+        <constructor-arg value="C:\temp\test.mp3"/>
+    </bean>-->
+    
+<!--    <bean id="media2" class="caja.jcastulo.media.audio.AudioMedia">
+        <constructor-arg value="C:\temp\Alice In Chains- Brother.mp3"/>
+    </bean>-->
+    
+    <bean id="mediaReaderFactory" class="caja.jcastulo.media.MediaReaderFactory">
+        <constructor-arg>
+            <bean class="caja.jcastulo.media.audio.Mp3FrameIterator"/>
+        </constructor-arg>
+    </bean>
+    
+    <!--stream-->
+    <bean id="dataReader" class="caja.jcastulo.stream.PreloadStreamDataReader"/>
+    
+<!--    <bean id="streamManagersService" class="caja.jcastulo.stream.services.StreamManagersServiceImpl">
+        <constructor-arg>
+            <list>
+                <bean class="caja.jcastulo.stream.StreamSpec">
+                    <constructor-arg value="mediaQueue"/>
+                    <constructor-arg value="/media.mp3"/>
+                    <constructor-arg>
+                        <list>
+                            <ref bean="media"/>
+                            <ref bean="media2"/>
+                        </list>
+                    </constructor-arg>
+                </bean>
+                <bean class="caja.jcastulo.stream.StreamSpec">
+                    <constructor-arg value="mediaQueue2"/>
+                    <constructor-arg value="/media2.mp3"/>
+                    <constructor-arg ref="media"/>
+                </bean>
+            </list>
+        </constructor-arg>
+        <constructor-arg ref="dataReader" />
+        <constructor-arg ref="mediaReaderFactory" />
+    </bean>-->
+    
+    <bean id="streamProviderResolver" class="caja.jcastulo.shout.http.HttpStreamProviderResolver">
+       <constructor-arg ref="streamManagersService" />
+    </bean>
+
+    <bean id="listenersManager" class="caja.jcastulo.shout.ListenerClerksManagerImpl">
+        <property name="streamProviderResolver" ref="streamProviderResolver"/>
+    </bean>
+    
+    <bean id="shoutServer" class="caja.jcastulo.shout.ShoutServer">
+        <constructor-arg ref="listenersManager"/>
+        <constructor-arg value="8001"/>
+    </bean>
+
+</beans>
