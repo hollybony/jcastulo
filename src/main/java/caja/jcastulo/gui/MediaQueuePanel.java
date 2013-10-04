@@ -8,12 +8,20 @@ import caja.gui.jtable.ActionModel;
 import caja.jcastulo.media.entities.AudioMedia;
 import caja.jcastulo.stream.StreamListener;
 import caja.jcastulo.stream.StreamUpdatable;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import javax.swing.JComponent;
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+import javax.swing.JTable;
 import javax.swing.SwingUtilities;
+import javax.swing.TransferHandler;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
+import org.slf4j.LoggerFactory;
 
 /**
  * Panel that shows the audio medias of a selected stream also allows to perform update operation such as
@@ -22,6 +30,11 @@ import javax.swing.table.DefaultTableModel;
  * @author Carlos Juarez
  */
 public class MediaQueuePanel extends javax.swing.JPanel implements StreamListener{
+    
+    /**
+     * The logger
+     */
+    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(MediaQueuePanel.class);
     
     /**
      * The stream displayed and ready to be updated
@@ -37,12 +50,91 @@ public class MediaQueuePanel extends javax.swing.JPanel implements StreamListene
      * The listener that performs audio media removals to the stream
      */
     private ActionListener removeListener = new ActionListener() {
+        
         @Override
         public void actionPerformed(ActionEvent e) {
             int index = (Integer) e.getSource();
             streamUpdatable.removeMedia(index);
         }
     };
+    
+    private TransferHandler transferHandler = new TransferHandler(){
+            
+            @Override
+            public int getSourceActions(JComponent c) {
+                return MOVE;
+            }
+            
+            @Override
+            protected Transferable createTransferable(JComponent c) {
+                JTable table = (JTable)c;
+                return new StringSelection("" + table.getSelectedRow());
+            }
+            
+//            @Override
+//            void exportDone(JComponent c, Transferable t, int action) {
+//                c.removeSelection();
+//            }
+            
+            @Override
+            public boolean canImport(TransferHandler.TransferSupport info) {
+                // we only import Strings
+                if (!info.isDataFlavorSupported(DataFlavor.stringFlavor)) {
+                    return false;
+                }
+                JTable.DropLocation dl = (JTable.DropLocation)info.getDropLocation();
+                if (dl.isInsertRow()&& dl.getRow()!=-1) {
+                    return true;
+                }
+                return false;
+            }
+             
+            @Override
+            public boolean importData(TransferHandler.TransferSupport info) {
+                if (!info.isDrop()) {
+                    return false;
+                }
+                // Check for String flavor
+                if (!info.isDataFlavorSupported(DataFlavor.stringFlavor)) {
+                    SwingUtilities.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            JOptionPane.showMessageDialog(null, "drop of this type not accepted");
+                        }
+                    });
+                    return false;
+                }
+
+                JTable.DropLocation dropLocation = (JTable.DropLocation)info.getDropLocation();
+                
+//                DefaultTableModel tableModel = (DefaultTableModel)jTable.getModel();
+                final int targetIndex = dropLocation.getRow();
+                final int sourceIndex;
+                try {
+                    Transferable t = info.getTransferable();
+                    sourceIndex = new Integer((String)t.getTransferData(DataFlavor.stringFlavor));
+                } catch (Exception ex) {
+                    logger.error("Exception when moving row", ex);
+                    return false;
+                }
+                if(sourceIndex==targetIndex-1||sourceIndex==targetIndex){
+                    return false;
+                }
+                
+                if(dropLocation.isInsertRow()) {
+//                    SwingUtilities.invokeLater(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            JOptionPane.showMessageDialog(null, "movin row from " + sourceIndex + " to " + targetIndex);
+//                        }
+//                    });
+//                    return false;
+                    streamUpdatable.moveMedia(sourceIndex, targetIndex);
+                    return true;
+                }
+		return false;
+            }
+        };
 
     /**
      * Creates a new instance of <code>MediaQueuePanel</code> class
@@ -50,6 +142,7 @@ public class MediaQueuePanel extends javax.swing.JPanel implements StreamListene
     public MediaQueuePanel() {
         initComponents();
         jTable.setRowHeight(26);
+        jTable.setTransferHandler(transferHandler);
         addButton.setEnabled(false);
     }
     
@@ -128,6 +221,10 @@ public class MediaQueuePanel extends javax.swing.JPanel implements StreamListene
                 return canEdit [columnIndex];
             }
         });
+        jTable.setDragEnabled(true);
+        jTable.setDropMode(javax.swing.DropMode.INSERT_ROWS);
+        jTable.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        jTable.getTableHeader().setReorderingAllowed(false);
         jScrollPane1.setViewportView(jTable);
         jTable.getColumnModel().getColumn(0).setMinWidth(20);
         jTable.getColumnModel().getColumn(0).setPreferredWidth(25);
