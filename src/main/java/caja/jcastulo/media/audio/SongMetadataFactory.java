@@ -20,7 +20,7 @@ public class SongMetadataFactory{
     final static org.slf4j.Logger logger = LoggerFactory.getLogger(SongMetadataFactory.class);
 
     public static SongMetadata createMedia(String path) {
-        SongMetadata metadata = null;
+        SongMetadata metadata = new SongMetadata("unknown", null, null);
         AudioFile audioFile;
         try {
             audioFile = AudioFileIO.read(new File(path));
@@ -29,9 +29,7 @@ public class SongMetadataFactory{
             logger.debug("reading media data from " + metadata);
         } catch (Exception ex) {
             logger.error("can't read tag from " + path, ex);
-        }finally{
-            
-        }       
+        }      
         return metadata;
     }
     

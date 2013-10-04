@@ -196,10 +196,11 @@ public class Mp3FrameHeader {
             if(samplerate + padding==0){
                 throw new RuntimeException("samplerate + padding = " + (samplerate + padding) + " it would cause / by zero");
             }
-            if(getLayerDescription()==1 ||getLayerDescription()==4){
+            if(getLayerDescription()==1 || getLayerDescription()==4){
                 logger.warn("layer description not allowed = " + getLayerDescription());
             }
-            return 144 * bitrate / (samplerate + padding);
+            
+            return 144 * bitrate / samplerate + padding;
         }
     }
 
@@ -225,15 +226,15 @@ public class Mp3FrameHeader {
     
     @Override
     public String toString() {
-        return "Mp3Header[" + offset + "] {" + "\n MPEG Version: "
-                + getMPEGVersion() + "\n Layer description: "
-                + getLayerDescription() + "\n Is CRC protected: "
-                + isCRCProtected() + "\n Bitrate: " + getBitRate()
-                + "\n Samplerate: " + getSampleRate() + "\n Is Padded: "
-                + isPadded() + "\n Channel mode: " + getChannelMode()
-                + "\n Mode Extension: " + getModeExtension() + "\n Copyright: "
-                + isCopyrighted() + "\n Is original: " + isOriginal()
-                + "\n Emphasis: " + getEmphasis() + "\n Frame size: "
-                + getFrameSize() + "\n}";
+        return "Mp3Header[" + offset + "] {" + " MPEG: "
+                + getMPEGVersion() + " Layer: "
+                + getLayerDescription() + " Is CRC protected: "
+                + isCRCProtected() + " Bitrate: " + getBitRate()
+                + " Samplerate: " + getSampleRate() + " Is Padded: "
+                + isPadded() + " Channel mode: " + getChannelMode()
+                + " Mode Extension: " + getModeExtension() + " Copyright: "
+                + isCopyrighted() + " Is original: " + isOriginal()
+                + " Emphasis: " + getEmphasis() + " Frame size: "
+                + getFrameSize() + "}";
     }
 }

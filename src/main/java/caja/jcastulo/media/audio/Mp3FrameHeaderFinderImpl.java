@@ -49,7 +49,13 @@ public class Mp3FrameHeaderFinderImpl implements Mp3FrameHeaderFinder{
             //is possible to know if the second byte starts with 111
             if (byte1 == (byte) 0xFF && (byte2 & 0xE0) == 0xE0 && (byte3 & 0xF0)!=0xF0) {
                 long oldOffset = currentHeader.getOffset();
-                currentHeader.setOffset(byteStreamReader.getOffset() - 2);
+                currentHeader.setOffset(byteStreamReader.getOffset() - 3);
+//                try{
+//                    if(currentHeader.getOffset()>oldOffset + currentHeader.getFrameSize()){
+//                        logger.debug("bytes between frame headers : " +  (currentHeader.getOffset()-(oldOffset + currentHeader.getFrameSize())));
+//                    }
+//                }catch(RuntimeException ex){   
+//                }
                 currentHeader.setData(byte1, byte2, byte3, byteStreamReader.read());
                 //log.info("Found frame start at index [" + (currentHeader.getOffset()) + "]");
                 logger.trace("oldOffset = "  + oldOffset + ", getOffset() = " + currentHeader.getOffset() + ", size = " + (currentHeader.getOffset()-oldOffset));

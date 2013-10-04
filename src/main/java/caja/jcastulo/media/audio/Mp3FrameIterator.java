@@ -7,6 +7,7 @@ import caja.jcastulo.media.SilentMediaReader;
 import caja.jcastulo.media.entities.AudioMedia;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import org.slf4j.LoggerFactory;
 
@@ -50,9 +51,7 @@ public class Mp3FrameIterator implements FrameIterator {
         if (byteStreamReader != null) {
             close();
         }
-        byteStreamReader = new ByteStreamReader();
-        logger.debug("openning media : " + media.getPathname());
-        byteStreamReader.setInputStream(new FileInputStream(new File(media.getPathname())));
+        byteStreamReader = buildByteStreamReader(media.getPathname());
     }
   
     /**
@@ -66,23 +65,24 @@ public class Mp3FrameIterator implements FrameIterator {
     public Frame next() throws IOException {
         Frame frame = new Frame();
         frameHeaderFinder.findNextHeader(currentHeader, byteStreamReader);
+        logger.trace("currentHeader : "  + currentHeader);
         if(currentHeader.getBitRate()==0 && !currentHeader.isCbr()){
             int size = (int)frameHeaderFinder.findNextHeader(currentHeader, byteStreamReader);
             logger.debug("CBR media frame size : " + size);
             currentHeader.setFixedFrameSize(size);
             currentHeader.setCbr(true);
+            logger.debug("CBR header : " + currentHeader);
         }
         if(currentHeader.getBitRate()==-1000){
             logger.debug("bitrate not valid");
             return SilentMediaReader.frame;
         }
-        logger.trace("currentHeader = " + currentHeader);
         frame.setSize(currentHeader.getFrameSize());
         //the header info is copied
         System.arraycopy(currentHeader.getData(), 0, frame.getData(), 0, 4);
         //since we already have the size of the frame we want we are going to take them from the reader
         //we skip 4 bytes that represent the header
-        byteStreamReader.read(frame.getData(), 4, (int) frame.getSize() - 4);
+        byteStreamReader.read(frame.getData(), 4, frame.getSize() - 4);
         return frame;
     }
     
@@ -104,10 +104,18 @@ public class Mp3FrameIterator implements FrameIterator {
     @Override
     public boolean hasNext() {
         try {
+//            logger.debug("available" + byteStreamReader.getInputStream().available());
             return byteStreamReader.getInputStream().available() <= 0;
         } catch (IOException ex) {
             return true;
         }
+    }
+    
+    private ByteStreamReader buildByteStreamReader(String pathname) throws FileNotFoundException{
+        ByteStreamReader streamReader = new ByteStreamReader();
+        logger.debug("openning media : " + pathname);
+        streamReader.setInputStream(new FileInputStream(new File(pathname)));
+        return streamReader;
     }
     
 }
