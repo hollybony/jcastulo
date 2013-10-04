@@ -12,20 +12,39 @@ import javax.swing.UIManager;
 import javax.swing.table.TableCellRenderer;
 
 /**
- *
+ * <code>TableCellRenderer</code> that displayed a button
  * @author Carlos Juarez
  */
 public class ButtonRenderer extends JButton implements TableCellRenderer {
     
+    /**
+     * Creates a new instance of <code>ButtonRenderer</code> class
+     */
     public ButtonRenderer() {
 //        setOpaque(true);
     }
     
+    /**
+     * Creates a new instance of <code>ButtonRenderer</code> class
+     * 
+     * @param icon - icon to set
+     */
     public ButtonRenderer(Icon icon) {
         super(icon);
 //        setOpaque(true);
     }
 
+    /**
+     * Configure the button to be renderer
+     * 
+     * @param table
+     * @param value - a <code>ActionModel</code> object is expected
+     * @param isSelected
+     * @param hasFocus
+     * @param row
+     * @param column
+     * @return the button
+     */
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
         if (isSelected) {

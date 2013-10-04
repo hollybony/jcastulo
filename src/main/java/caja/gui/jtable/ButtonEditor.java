@@ -14,27 +14,54 @@ import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 
 /**
- *
+ * Cell editor that allows to set a <code>JButton</code> at edition time
+ * 
  * @author Carlos Juarez
  */
 public class ButtonEditor extends DefaultCellEditor {
 
+    /**
+     * The button that will be displayed during edition
+     */
     protected JButton button;
     
+    /**
+     * The label used as tooltip of the button
+     */
     private String label;
     
+    /**
+     * Indicates whether the button is pushed
+     */
     private boolean isPushed;
     
+    /**
+     * Action to perform in the button click event
+     */
     private ActionListener actionListener;
     
+    /**
+     * event to be sent in the button click event
+     */
     private ActionEvent event;
     
+    /**
+     * Addition data to be set as the source of the event
+     */
     private Object payload;
 
+    /**
+     * Creates an instance of <code>ButtonEditor</code> class
+     */
     public ButtonEditor() {
         this(null);
     }
     
+    /**
+     * Creates an instance of <code>ButtonEditor</code> class
+     * 
+     * @param actionListener - actionListener to set
+     */
     public ButtonEditor(ActionListener actionListener) {
         super(new JCheckBox());
         button = new JButton();
@@ -50,6 +77,15 @@ public class ButtonEditor extends DefaultCellEditor {
         });
     }
     
+    /**
+     * A button is used as cell editor component
+     * @param table
+     * @param value
+     * @param isSelected
+     * @param row
+     * @param column
+     * @return the button
+     */
     @Override
     public Component getTableCellEditorComponent(JTable table, Object value,
             boolean isSelected, int row, int column) {
