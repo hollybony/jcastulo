@@ -111,12 +111,12 @@ public class StreamsPanel extends javax.swing.JPanel {
         for (StreamManager streamManager : streamManagers) {
             ActionModel actionModel;
             if (streamManager.isRunning()) {
-                actionModel = ActionModels.getInstance().stopActionModel.copy();
+                actionModel = ActionModels.getInstance().getActionModel("stop.png").copy();
             } else {
-                actionModel = ActionModels.getInstance().startActionModel.copy();
+                actionModel = ActionModels.getInstance().getActionModel("start.png").copy();
             }
             actionModel.setPayload(streamManager.getStreamName());
-            ActionModel removeModel = ActionModels.getInstance().removeActionModel.copy();
+            ActionModel removeModel = ActionModels.getInstance().getActionModel("remove.png").copy();
             removeModel.setPayload(streamManager.getStreamName());
             model.addRow(new Object[]{streamManager.getStreamName(), streamManager.getMountPoint(), actionModel, removeModel});
         }

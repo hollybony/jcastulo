@@ -12,15 +12,25 @@ import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
 
 /**
- *
+ * Panel that shows the stream listeners at real time
+ * 
  * @author Carlos Juarez
  */
 public class ListenersPanel extends javax.swing.JPanel {
     
+    /**
+     * The listenerClerksManager
+     */
     private ListenerClerksManager listenersManager;
     
+    /**
+     * The current mountPoint for which its listeners will be showed
+     */
     private String currentMountPoint;
     
+    /**
+     * The ListenerUpdatesListener
+     */
     private ListenerUpdatesListener listener = new ListenerUpdatesListener() {
 
         @Override
@@ -45,17 +55,23 @@ public class ListenersPanel extends javax.swing.JPanel {
     };
 
     /**
-     * Creates new form ListenersPanel
+     * Creates a new instance of <code>ListenersPanel</code>
      */
     public ListenersPanel() {
         initComponents();
     }
 
+    /**
+     * @param currentMountPoint - the currentMountPoint to set
+     */
     public void setCurrentMountPoint(String currentMountPoint) {
         this.currentMountPoint = currentMountPoint;
         refresh();
     }
     
+    /**
+     * Retrieves the most recent listener information and refreshes the table
+     */
     private void refresh(){
         DefaultTableModel model = (DefaultTableModel) jTable.getModel();
         List<ClientSpec> clientSpecs = listenersManager.getListenerClerksByMountpoint(currentMountPoint);
@@ -65,6 +81,9 @@ public class ListenersPanel extends javax.swing.JPanel {
         }
     }
     
+    /**
+     * @param listenersManager - the listenersManager to set
+     */
     public void setListenersManager(ListenerClerksManager listenersManager) {
         this.listenersManager = listenersManager;
         this.listenersManager.addListenerUpdatesListener(listener);

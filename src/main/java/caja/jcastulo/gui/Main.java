@@ -11,7 +11,6 @@ import caja.jcastulo.stream.services.StreamManagersService;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import javax.swing.DefaultListSelectionModel;
-import javax.swing.JOptionPane;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
@@ -20,24 +19,28 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
+ * Main frame of this application. Beans are retrieved from the Spring context
+ * then they are set in the corresponding GUI components.
  *
  * @author Carlos Juarez
  */
 public class Main extends javax.swing.JFrame {
-    
+
     final org.slf4j.Logger logger = LoggerFactory.getLogger(Main.class);
-    
-    private ApplicationContext context;    
-        
     /**
-     * Creates new form Main
+     * Spring context
+     */
+    private ApplicationContext context;
+
+    /**
+     * Constructs an instance of
+     * <code>Main</code> class
      */
     public Main() {
-        initBeans();
         initComponents();
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-        setLocation((dim.width-getSize().width)/2, (dim.height-getSize().height)/2);
-        finishInitComponents();
+        setLocation((dim.width - getSize().width) / 2, (dim.height - getSize().height) / 2);
+        initContext();
     }
 
     /**
@@ -133,6 +136,11 @@ public class Main extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    /**
+     * Must be called when this frame is closing to clean up some stuff
+     *
+     * @param evt
+     */
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
         serverPanel.cleanup();
         streamsPanel.cleanup();
@@ -185,33 +193,29 @@ public class Main extends javax.swing.JFrame {
     private javax.swing.JSplitPane verticalSplit;
     // End of variables declaration//GEN-END:variables
 
-    private void initBeans() {
+    /**
+     * Retrieves context beans and set them to the corresponding panels
+     */
+    private void initContext() {
         //init Spring IoC
         context = new ClassPathXmlApplicationContext(new String[]{"META-INF/spring/datasource.xml", "META-INF/spring/jpa-tx-config.xml", "META-INF/spring/jpa-service-context.xml", "META-INF/spring/root-context.xml"});
-    }
-
-    private void finishInitComponents() {
         serverPanel.setShoutServer(context.getBean("shoutServer", ShoutServer.class));
-        ListenerClerksManager listenersManager = context.getBean("listenersManager", ListenerClerksManager.class);
-        listenersPanel.setListenersManager(listenersManager);
+        listenersPanel.setListenersManager(context.getBean("listenersManager", ListenerClerksManager.class));
         final StreamManagersService streamManagersService = context.getBean("streamManagersService", StreamManagersService.class);
         streamsPanel.setStreamManagersService(streamManagersService);
         streamsPanel.getStreamsTable().getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-
             @Override
             public void valueChanged(ListSelectionEvent event) {
                 Integer index = ((DefaultListSelectionModel) event.getSource()).getLeadSelectionIndex();
-                if(!((DefaultListSelectionModel)event.getSource()).isSelectionEmpty()){
+                if (!((DefaultListSelectionModel) event.getSource()).isSelectionEmpty()) {
 //                    System.out.println("event : " + event);
                     DefaultTableModel model = (DefaultTableModel) streamsPanel.getStreamsTable().getModel();
-                    
-                    StreamManager streamManager =  streamManagersService.getAllStreamManagers().get(index);
+
+                    StreamManager streamManager = streamManagersService.getAllStreamManagers().get(index);
                     mediaQueuePanel.setStreamUpdatable(streamManager.getProcessor());
                     listenersPanel.setCurrentMountPoint(streamManager.getMountPoint());
                 }
             }
         });
-                
     }
-
 }

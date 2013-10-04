@@ -16,15 +16,26 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
 
 /**
+ * Panel that shows the audio medias of a selected stream also allows to perform update operation such as
+ * add, remove songs
  *
  * @author Carlos Juarez
  */
 public class MediaQueuePanel extends javax.swing.JPanel implements StreamListener{
     
+    /**
+     * The stream displayed and ready to be updated
+     */
     private StreamUpdatable streamUpdatable;
     
+    /**
+     * The chooser to choose audio files
+     */
     private JFileChooser chooser;
     
+    /**
+     * The listener that performs audio media removals to the stream
+     */
     private ActionListener removeListener = new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -34,7 +45,7 @@ public class MediaQueuePanel extends javax.swing.JPanel implements StreamListene
     };
 
     /**
-     * Creates new form MediaQueuePanel
+     * Creates a new instance of <code>MediaQueuePanel</code> class
      */
     public MediaQueuePanel() {
         initComponents();
@@ -42,6 +53,11 @@ public class MediaQueuePanel extends javax.swing.JPanel implements StreamListene
         addButton.setEnabled(false);
     }
     
+    /**
+     * To set a new streamUpdatable and refresh the panel with the new audio medias
+     * 
+     * @param streamUpdatable - the streamUpdatable to set
+     */
     public void setStreamUpdatable(StreamUpdatable streamUpdatable) {
         if(this.streamUpdatable!=null){
             this.streamUpdatable.removeListener(this);
@@ -51,13 +67,16 @@ public class MediaQueuePanel extends javax.swing.JPanel implements StreamListene
         refresh();
     }
 
+    /**
+     * Refreshes the panel with the audio medias
+     */
     private void refresh() {
         addButton.setEnabled(true);
         DefaultTableModel model = (DefaultTableModel) jTable.getModel();
         model.setRowCount(0);
         int i = 0;
         for (AudioMedia media : streamUpdatable.getStreamSpec().getAudioMedias()) {
-            ActionModel removeModel = ActionModels.getInstance().removeActionModel.copy();
+            ActionModel removeModel = ActionModels.getInstance().getActionModel("remove.png").copy();
             removeModel.setPayload(i);
             model.addRow(new Object[]{++i, media.toString(),removeModel});
         }
@@ -180,6 +199,9 @@ public class MediaQueuePanel extends javax.swing.JPanel implements StreamListene
     private javax.swing.JLabel statusLabel;
     // End of variables declaration//GEN-END:variables
 
+    /**
+     * Invoked when the stream just changed the current audio media
+     */
     @Override
     public void mediaChanged() {
         SwingUtilities.invokeLater(new Runnable() {
@@ -190,6 +212,9 @@ public class MediaQueuePanel extends javax.swing.JPanel implements StreamListene
         });
     }
     
+    /**
+     * Invoked when the stream queue has changed
+     */
     @Override
     public void queueChanged(){
         mediaChanged();

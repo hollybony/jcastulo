@@ -14,31 +14,56 @@ import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
 /**
- *
+ * Panel that allows to control a <code>ShoutServer</code>
+ * 
  * @author Carlos Juarez
  */
 public class ServerPanel extends javax.swing.JPanel implements ServerListener {
     
+    /**
+     * Stopped status label
+     */
     private static final String STOPPED_STATUS = "Stopped";
     
+    /**
+     * Running status label
+     */
     private static final String RUNNING_STATUS = "Running";
     
+    /**
+     * Start server label
+     */
     private static final String START_SERVER = "Start";
     
+    /**
+     * Stop server label
+     */
     private static final String STOP_SERVER = "Stop";
 
+    /**
+     * The shoutcast server
+     */
     private ShoutServer shoutServer;
 
+    /**
+     * Constructs an instance of <code>ServerPanel</code> class
+     */
     public ServerPanel() {
         initComponents();
     }
 
+    /**
+     * @param shoutServer - shoutServer to set
+     */
     public void setShoutServer(ShoutServer shoutServer) {
         this.shoutServer = shoutServer;
         this.shoutServer.addServerListener(this);
         portTextField.setText(Integer.toString(shoutServer.getPort()));
     }
     
+    /**
+     * Should be called when closing the main frame to cleanup resources
+     */
     public void cleanup() {
         if (shoutServer.isRunning()) {
             shoutServer.shutdown();
@@ -116,6 +141,10 @@ public class ServerPanel extends javax.swing.JPanel implements ServerListener {
         );
     }// </editor-fold>//GEN-END:initComponents
 
+    /**
+     * Runs or stops the server depending of the current status, if the server is running then will be stopped and vice versa
+     * @param evt 
+     */
     private void jButtonCtrlActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCtrlActionPerformed
         if (!shoutServer.isRunning()) {
                 shoutServer.setPort(Integer.parseInt(portTextField.getText()));
@@ -163,6 +192,11 @@ public class ServerPanel extends javax.swing.JPanel implements ServerListener {
     private javax.swing.JFormattedTextField portTextField;
     // End of variables declaration//GEN-END:variables
 
+    /**
+     * It is called when the server has changed its status
+     * 
+     * @param serverStatus - the new status
+     */
     @Override
     public void notifyNewServerStatus(final ServerStatus serverStatus) {
         SwingUtilities.invokeLater(new Runnable() {
