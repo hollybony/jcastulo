@@ -95,6 +95,7 @@ public class StreamManagersServiceImpl implements StreamManagersService{
             if(streamManager.getStreamName().equals(name)){
                 logger.debug("removing : " + streamManager);
                 streamManagers.remove(streamManager);
+                streamSpecsService.removeStreamSpec(name);
             }
         }
     }

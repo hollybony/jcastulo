@@ -28,7 +28,7 @@ public class FrameStorage {
      * @param time
      * @return A TimedFrame that overlapped the given time.
      */
-    public synchronized TimedFrame find(long time) {
+    public synchronized TimedFrame find(final long time) {
         if (timedFrames.isEmpty()) {
             throw new EmptyFrameStorageException();
         }
@@ -79,9 +79,9 @@ public class FrameStorage {
      *
      * @return End time of the last frame in storage.
      */
-    public synchronized long getLastFrameTime() {
+    public synchronized Long getLastFrameTime() {
         if (timedFrames.isEmpty()) {
-            throw new EmptyFrameStorageException();
+            return null;
         }
         return timedFrames.getLast().getStopTime();
     }
