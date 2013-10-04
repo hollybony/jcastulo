@@ -249,6 +249,44 @@ public class StreamProcessorImpl implements StreamUpdatable {
             }
         }
     }
+    
+    /**
+     * first take off then put in
+     * @param sourceIndex
+     * @param targetIndex 
+     */
+    @Override
+    public void moveMedia(int sourceIndex, int targetIndex) {
+        synchronized (this) {
+            AudioMedia sourceMedia;
+            synchronized (streamSpec.getAudioMedias()) {
+                try{
+                    sourceMedia = streamSpec.getAudioMedias().get(sourceIndex);        
+                    if(sourceIndex==0 && status.equals(Status.PLAYING)){
+                        streamSpec.getAudioMedias().add(targetIndex, sourceMedia);
+                        status = Status.CURRENT_MEDIA_CHANGE_REQUESTED;
+                    }else if(targetIndex==0 && status.equals(Status.PLAYING)){
+                        streamSpec.getAudioMedias().remove(sourceIndex);
+                        streamSpec.getAudioMedias().add(1, sourceMedia);
+                        streamSpec.getAudioMedias().add(2, streamSpec.getAudioMedias().get(0));
+                        status = Status.CURRENT_MEDIA_CHANGE_REQUESTED;
+                    }else{
+                        streamSpec.getAudioMedias().add(targetIndex, sourceMedia);
+                        streamSpec.getAudioMedias().remove(sourceIndex<targetIndex?sourceIndex:sourceIndex+1);
+                        for (StreamListener streamListener : streamListeners) {
+                            streamListener.queueChanged();
+                        }
+                    }
+                }catch(IndexOutOfBoundsException ex){
+                }
+            }
+        }
+    }
+    
+    @Override
+    public void removeListener(StreamListener listener) {
+        streamListeners.remove(listener);
+    }
 
     @Override
     public byte[] currentMetadataBytes() {
@@ -270,8 +308,5 @@ public class StreamProcessorImpl implements StreamUpdatable {
         streamListeners.add(listener);
     }
 
-    @Override
-    public void removeListener(StreamListener listener) {
-        streamListeners.remove(listener);
-    }
+  
 }

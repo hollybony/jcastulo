@@ -17,4 +17,5 @@ public interface StreamUpdatable extends StreamProcessor{
         
     public void removeMedia(int index);
     
+    public void moveMedia(int sourceIndex, int targetIndex);
 }
