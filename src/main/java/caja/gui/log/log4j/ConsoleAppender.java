@@ -18,21 +18,41 @@ import org.apache.log4j.Level;
 import org.apache.log4j.spi.LoggingEvent;
 
 /**
- *
+ * Log4j console appender
+ * 
  * @author Carlos Juarez
  */
 public class ConsoleAppender extends AppenderSkeleton {
 
+    /**
+     * textComponent where the logs will be appended
+     */
     private JTextComponent textComponent;
     
+    /**
+     * EOL string to be added at the end of every log
+     */
     private final String EOL = System.getProperty("line.separator");
     
+    /**
+     * document taken from the textComponent it is just a convenience reference to easier access
+     */
     private Document document;
     
+    /**
+     * limitLinesListener that would control the limit of lines that the document can have
+     */
     private DocumentListener limitLinesListener;
     
+    /**
+     * Holds look and feel attributes for every level. The log messages will be displayed with
+     * this attributes
+     */
     private Map<Level, SimpleAttributeSet> attributeSets;
 
+    /**
+     * Constructs an instance of <code>ConsoleAppender</code> class
+     */
     public ConsoleAppender() {
 //        this.textComponent.setEditable(false);
 //        this.document = textComponent.getDocument();
@@ -47,13 +67,20 @@ public class ConsoleAppender extends AppenderSkeleton {
         StyleConstants.setForeground(attributeSets.get(Level.DEBUG), Color.BLUE);
     }
 
+    /**
+     * @param textComponent - textComponent to set
+     */
     public void setTextComponent(JTextComponent textComponent) {
         this.textComponent = textComponent;
-        document = textComponent.getDocument();
+//        document = textComponent.getDocument();
         textComponent.setEditable(false);
         document = textComponent.getDocument();
     }
 
+    /**
+     * Allows to set the limit of lines in the document
+     * @param lines 
+     */
     public void setMessageLines(int lines) {
         if (limitLinesListener != null) {
             document.removeDocumentListener(limitLinesListener);
@@ -77,6 +104,12 @@ public class ConsoleAppender extends AppenderSkeleton {
         handleAppend(message, event.getLevel());
     }
 
+    /**
+     * Appends a message to the document and used the look and feel attributes given by the level
+     * 
+     * @param message - the message to append
+     * @param level  - the level of the message
+     */
     private void handleAppend(String message, Level level) {
         String line = message + EOL;
         try {

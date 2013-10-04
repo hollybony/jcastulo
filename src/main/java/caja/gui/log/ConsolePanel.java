@@ -14,14 +14,22 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 
 /**
- *
+ * Panel that displays a log console
+ * 
  * @author Carlos Juarez
  */
 public class ConsolePanel extends javax.swing.JPanel {
     
+    /**
+     * Custom log4j appender
+     */
     private ConsoleAppender consoleAppender;
 
-    private ActionListener actionListener = new ActionListener() {
+    /**
+     * Action listener performed in menu action event. This current implementation
+     * cleans the console
+     */
+    private ActionListener menuActionListener = new ActionListener() {
 
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -30,7 +38,7 @@ public class ConsolePanel extends javax.swing.JPanel {
     };
     
     /**
-     * Creates new form ConsolePanel
+     * Constructs a new instance of <code>ConsolePanel</code> class
      */
     public ConsolePanel() {
         initComponents();
@@ -42,8 +50,8 @@ public class ConsolePanel extends javax.swing.JPanel {
         consoleAppender.setThreshold(Level.INFO);
         Logger.getRootLogger().addAppender(consoleAppender);
         JPopupMenu popupMenu = new JPopupMenu();
-        JMenuItem menuItem = new JMenuItem("Clean");
-        menuItem.addActionListener(actionListener);
+        JMenuItem menuItem = new JMenuItem("Clear");
+        menuItem.addActionListener(menuActionListener);
         popupMenu.add(menuItem);
         consoleTextPane.setComponentPopupMenu(popupMenu);
     }

@@ -7,15 +7,20 @@ package caja.gui.utils;
 import javax.swing.JFrame;
 
 /**
- *
+ * Panel which is displayed as a modal wait message. This is a singleton class as only one wait message should be
+ * showed at a time
+ * 
  * @author Carlos Juarez
  */
 public class WaitDialog extends javax.swing.JDialog {
     
+    /**
+     * Single instance
+     */
     private static WaitDialog waitDialog;
 
     /**
-     * Creates new form WaitDialog
+     * Creates a new instance of <code>WaitDialog</code> class
      */
     private WaitDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
@@ -23,6 +28,10 @@ public class WaitDialog extends javax.swing.JDialog {
         setLocationRelativeTo(null);
     }
     
+    
+    /**
+     * Shows the wait dialog
+     */
     public static void showMsg(){
         if(waitDialog==null){
             waitDialog = new WaitDialog((JFrame) null, true);
@@ -30,6 +39,9 @@ public class WaitDialog extends javax.swing.JDialog {
         waitDialog.setVisible(true);
     }
     
+    /**
+     * Hides the wait dialog
+     */
     public static void hideMsg(){
         if(waitDialog!=null){
             waitDialog.setVisible(false);
