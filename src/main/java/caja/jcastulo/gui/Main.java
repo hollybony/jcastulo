@@ -217,5 +217,6 @@ public class Main extends javax.swing.JFrame {
                 }
             }
         });
+        consolePanel.clearLogs();
     }
 }
