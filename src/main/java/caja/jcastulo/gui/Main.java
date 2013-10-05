@@ -4,6 +4,7 @@
  */
 package caja.jcastulo.gui;
 
+import caja.gui.utils.WaitDialog;
 import caja.jcastulo.shout.ListenerClerksManager;
 import caja.jcastulo.shout.ShoutServer;
 import caja.jcastulo.stream.StreamManager;
@@ -11,6 +12,7 @@ import caja.jcastulo.stream.services.StreamManagersService;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import javax.swing.DefaultListSelectionModel;
+import javax.swing.SwingWorker;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
@@ -142,8 +144,21 @@ public class Main extends javax.swing.JFrame {
      * @param evt
      */
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
-        serverPanel.cleanup();
-        streamsPanel.cleanup();
+        SwingWorker worker = new SwingWorker<Void,Void>() {
+          
+            @Override
+            protected Void doInBackground() throws Exception {
+                serverPanel.cleanup();
+                streamsPanel.cleanup();
+                return null;
+            }
+            @Override
+            protected void done() {
+                WaitDialog.hideMsg();
+            }
+        };
+        worker.execute();
+        WaitDialog.showMsg();
     }//GEN-LAST:event_formWindowClosing
 
     /**
