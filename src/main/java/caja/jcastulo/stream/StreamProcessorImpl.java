@@ -1,7 +1,7 @@
 package caja.jcastulo.stream;
 
 import caja.jcastulo.media.FrameIterator;
-import caja.jcastulo.media.MediaReaderFactory;
+import caja.jcastulo.media.FrameIteratorFactory;
 import caja.jcastulo.media.MetadataManager;
 import caja.jcastulo.media.SilentMediaReader;
 import caja.jcastulo.media.audio.SongMetadata;
@@ -24,9 +24,9 @@ public class StreamProcessorImpl implements StreamUpdatable {
     
     protected final FrameStorage frameStorage = new FrameStorage();
     
-    private FrameIterator mediaReader;
+    private FrameIterator frameIterator;
     
-    private MediaReaderFactory mediaReaderFactory;
+    private FrameIteratorFactory mediaReaderFactory;
     
     private StreamSpec streamSpec;
     
@@ -46,10 +46,10 @@ public class StreamProcessorImpl implements StreamUpdatable {
     }
 
     public StreamProcessorImpl(StreamSpec streamSpec, DataReader dataReader) {
-        this(streamSpec, dataReader, new MediaReaderFactory());
+        this(streamSpec, dataReader, new FrameIteratorFactory());
     }
 
-    public StreamProcessorImpl(StreamSpec streamSpec, DataReader dataReader, MediaReaderFactory mediaReaderFactory) {
+    public StreamProcessorImpl(StreamSpec streamSpec, DataReader dataReader, FrameIteratorFactory mediaReaderFactory) {
         this.streamSpec = streamSpec;
         metadataManager = new MetadataManager();
         streamListeners = new ArrayList<StreamListener>();
@@ -77,8 +77,8 @@ public class StreamProcessorImpl implements StreamUpdatable {
                 return;
             }
             try {
-                if (mediaReader != null) {
-                    dataReader.readData(mediaReader, frameStorage);
+                if (frameIterator != null) {
+                    dataReader.readData(frameIterator, frameStorage);
                 }
             } catch (InterruptedException ex) {
                 logger.debug(Thread.currentThread().getName() + " processor interrupted while reading data", ex);
@@ -96,15 +96,15 @@ public class StreamProcessorImpl implements StreamUpdatable {
 
     protected synchronized void cleanup() {
         frameStorage.clear();
-        if (mediaReader != null) {
+        if (frameIterator != null) {
             try {
-                mediaReader.close();
+                frameIterator.close();
             } catch (IOException ex) {
                 logger.error(Thread.currentThread().getName() + " IOException while closing the mediaReader", ex);
             }
         }
         status = Status.STOPPED;
-        mediaReader = null;
+        frameIterator = null;
     }
 
     /**
@@ -117,9 +117,9 @@ public class StreamProcessorImpl implements StreamUpdatable {
     private void updateMediaReader() {
         if (status.equals(Status.CURRENT_MEDIA_CHANGE_REQUESTED)) {
             logger.info("skipping current media " + currentMetadata());
-            if (mediaReader != null) {
+            if (frameIterator != null) {
                 try {
-                    mediaReader.close();
+                    frameIterator.close();
                 } catch (IOException ex) {}
             }
             consumeMedia(0);
@@ -133,18 +133,18 @@ public class StreamProcessorImpl implements StreamUpdatable {
                 playSilence();
             }
         }else if(status.equals(Status.PLAYING)){
-            if (mediaReader == null && !streamSpec.getAudioMedias().isEmpty()) {
+            if (frameIterator == null && !streamSpec.getAudioMedias().isEmpty()) {
                 try {
                     playMedia();
                 } catch (IOException ex) {
                     processCurrentMediaError(ex);
                 }
-            }else if (mediaReader != null && mediaReader.hasNext()) {
+            }else if (frameIterator != null && frameIterator.hasNext()) {
                 consumeMedia(0);
                 try{
-                    mediaReader.close();
+                    frameIterator.close();
                 }catch(IOException ex){}
-                mediaReader = null;
+                frameIterator = null;
                 // consume the played file
                 if (!streamSpec.getAudioMedias().isEmpty()) {
                     try {
@@ -168,7 +168,7 @@ public class StreamProcessorImpl implements StreamUpdatable {
     }
     
     private void playSilence(){
-        mediaReader = SilentMediaReader.getInstance();
+        frameIterator = SilentMediaReader.getInstance();
         updateCurrentMedia(null);
         status = Status.PLAYING_SILENCE;
         for (StreamListener listener : streamListeners) {
@@ -177,8 +177,8 @@ public class StreamProcessorImpl implements StreamUpdatable {
     }
     
     private void playMedia() throws IOException{
-        mediaReader = mediaReaderFactory.getMediaReader(streamSpec.getAudioMedias().get(0));
-        mediaReader.open(streamSpec.getAudioMedias().get(0));
+        frameIterator = mediaReaderFactory.getFrameIterator(streamSpec.getAudioMedias().get(0));
+        frameIterator.open(streamSpec.getAudioMedias().get(0));
         updateCurrentMedia(streamSpec.getAudioMedias().get(0));
         logger.info("now playing " + currentMetadata());
         status = Status.PLAYING;
@@ -190,7 +190,7 @@ public class StreamProcessorImpl implements StreamUpdatable {
     private void processCurrentMediaError(Exception ex){
         logger.error(Thread.currentThread().getName() + " can't open [" + streamSpec.getAudioMedias().get(0) + "], skipping file", ex);
         consumeMedia(0);
-        mediaReader = SilentMediaReader.getInstance();
+        frameIterator = SilentMediaReader.getInstance();
         updateCurrentMedia(null);
         status = Status.PLAYING_SILENCE;
         for (StreamListener listener : streamListeners) {
@@ -209,7 +209,7 @@ public class StreamProcessorImpl implements StreamUpdatable {
      * @param media
      */
     protected void updateCurrentMedia(final AudioMedia media) {
-        if (mediaReader == SilentMediaReader.getInstance()) {
+        if (frameIterator == SilentMediaReader.getInstance()) {
             metadataManager.setMetadata(new SongMetadata("silence...", null, null));
         } else {
             SongMetadata songMetadata = media.getSongMetadata();

@@ -4,7 +4,7 @@
  */
 package caja.jcastulo.stream.services;
 
-import caja.jcastulo.media.MediaReaderFactory;
+import caja.jcastulo.media.FrameIteratorFactory;
 import caja.jcastulo.stream.DataReader;
 import caja.jcastulo.stream.StreamManager;
 import caja.jcastulo.stream.StreamProcessorImpl;
@@ -34,7 +34,7 @@ public class StreamManagersServiceImpl implements StreamManagersService{
     private DataReader dataReader;
     
     @Autowired
-    private MediaReaderFactory mediaReaderFactory;
+    private FrameIteratorFactory mediaReaderFactory;
     
     List<StreamManager> streamManagers;
     
