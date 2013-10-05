@@ -5,6 +5,7 @@
 package caja.jcastulo.gui;
 
 import caja.gui.jtable.ActionModel;
+import caja.gui.utils.WaitDialog;
 import caja.jcastulo.media.entities.AudioMedia;
 import caja.jcastulo.stream.StreamListener;
 import caja.jcastulo.stream.StreamUpdatable;
@@ -13,11 +14,13 @@ import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
 import javax.swing.TransferHandler;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
@@ -175,6 +178,27 @@ public class MediaQueuePanel extends javax.swing.JPanel implements StreamListene
         }
         statusLabel.setText(streamUpdatable.currentMetadata().toString());
     }
+    
+    private static boolean isMp3File(File file){
+        if(file.isFile()){
+            int i = file.getPath().lastIndexOf(".");
+            if(i>0 && file.getPath().substring(i+1).equalsIgnoreCase("mp3")){
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    private void addMediaFile(File... files){
+        for(File file : files){
+            if(isMp3File(file)){
+                AudioMedia media = new AudioMedia(file.getPath());
+                streamUpdatable.addMedia(media);
+            }else if(file.isDirectory()){
+                addMediaFile(file.listFiles());
+            }
+        }
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -279,12 +303,27 @@ public class MediaQueuePanel extends javax.swing.JPanel implements StreamListene
             chooser = new JFileChooser();
             FileNameExtensionFilter filter = new FileNameExtensionFilter("Mp3 files", "mp3");
             chooser.setFileFilter(filter);
+            chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+            chooser.setMultiSelectionEnabled(true);
         }
         int returnVal = chooser.showOpenDialog(null);
         if(returnVal == JFileChooser.APPROVE_OPTION) {
-            AudioMedia media = new AudioMedia(chooser.getSelectedFile().getPath());
-            streamUpdatable.addMedia(media);
-//            System.out.println("You chose to open this file: " + chooser.getSelectedFile().getName());
+            final File[] selectedFiles = chooser.getSelectedFiles();
+            SwingWorker worker = new SwingWorker<Void, Void>() {
+                @Override
+                protected Void doInBackground() throws Exception {
+                    addMediaFile(selectedFiles);
+                    return null;
+                }
+
+                @Override
+                protected void done() {
+                    WaitDialog.hideMsg();
+                    refresh();
+                }
+            };
+            worker.execute();
+            WaitDialog.showMsg();
         }
     }//GEN-LAST:event_addButtonActionPerformed
 
