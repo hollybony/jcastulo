@@ -33,12 +33,14 @@ public class ConsolePanel extends javax.swing.JPanel {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            consoleTextPane.setText("");
+            clearLogs();
         }
     };
     
     /**
      * Constructs a new instance of <code>ConsolePanel</code> class
+     * The console appender is registered to the root logger
+     * 
      */
     public ConsolePanel() {
         initComponents();
@@ -54,6 +56,10 @@ public class ConsolePanel extends javax.swing.JPanel {
         menuItem.addActionListener(menuActionListener);
         popupMenu.add(menuItem);
         consoleTextPane.setComponentPopupMenu(popupMenu);
+    }
+    
+    public void clearLogs(){
+        consoleTextPane.setText("");
     }
 
     /**
