@@ -12,8 +12,14 @@ import org.slf4j.LoggerFactory;
  */
 public class ByteStreamReader {
 
+    /**
+     * The logger
+     */
     final org.slf4j.Logger logger = LoggerFactory.getLogger(ByteStreamReader.class);
     
+    /**
+     * The inputStream
+     */
     private InputStream inputStream = null;
     
     /**
@@ -41,10 +47,13 @@ public class ByteStreamReader {
     private int writeIndex = 0;
     
     /**
-     * 
+     * an internal offset index
      */
     private int indexOffset = 0;
 
+    /**
+     * Constructs an instance of <code>ByteStreamReader</code> class
+     */
     public ByteStreamReader() {
         //1 MB of capacity
         buffer = ByteBuffer.allocateDirect(1024 * 1024);
@@ -69,9 +78,7 @@ public class ByteStreamReader {
     }
     
     /**
-     * Returns the position of the read-cursor
-     *
-     * @return
+     * @returnthe position of the read-cursor
      */
     public int getOffset() {
         return indexOffset + readIndex;
@@ -145,10 +152,16 @@ public class ByteStreamReader {
         readIndex = 0;
     }
 
+    /**
+     * @return the inputStream
+     */
     public InputStream getInputStream() {
         return inputStream;
     }
 
+    /**
+     * @param inputStream - the inputStream to set
+     */
     public void setInputStream(InputStream inputStream) {
         this.inputStream = inputStream;
     }

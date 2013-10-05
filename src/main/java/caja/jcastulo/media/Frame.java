@@ -26,8 +26,7 @@ public class Frame {
     private final byte[] data;
 
     /**
-     * 
-     * @param allocationSize size of byte array
+     * Constructs an instance of <code>Frame</code> class
      */
     public Frame() {
         length = 26;
@@ -37,9 +36,11 @@ public class Frame {
     }
 
     /**
+     * Constructs an instance of <code>Frame</code> class
+     * 
      * Makes a deep copy of the given frame.
      *
-     * @param frame
+     * @param frame - frame to copy
      */
     public Frame(Frame frame) {
         length = frame.length;
@@ -49,35 +50,35 @@ public class Frame {
     }
 
     /**
-     * Get the length
-     *
-     * @return Length of frame in Ms
+     * @return length of frame in milliseconds
      */
     public long getLength() {
         return length;
     }
 
+    /**
+     * @param length - length to set
+     */
     public void setLength(long length) {
         this.length = length;
     }
 
     /**
-     * Get the size of the frame in bytes.
-     *
      * @return Size of frame in bytes
      */
     public int getSize() {
         return size;
     }
 
+    /**
+     * @param size - the frame size
+     */
     public void setSize(int size) {
         this.size = size;
     }
 
     /**
-     * Returns a reference to the data
-     *
-     * @return
+     * @return the data contained
      */
     public byte[] getData() {
         return data;

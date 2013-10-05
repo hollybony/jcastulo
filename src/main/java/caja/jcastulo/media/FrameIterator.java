@@ -4,6 +4,7 @@ import caja.jcastulo.media.entities.AudioMedia;
 import java.io.IOException;
 
 /**
+ * Iterates over a resource that provides frames
  * 
  * @author Carlos Juarez
  */
@@ -12,8 +13,8 @@ public interface FrameIterator {
     /**
      * Returns true if this reader supports the format of the given media.
      *
-     * @param media
-     * @return
+     * @param media - media to analyze
+     * @return <code>true</code> if the media is supported
      */
     public boolean supports(AudioMedia media);
 
@@ -47,14 +48,5 @@ public interface FrameIterator {
      * @return
      */
     public boolean hasNext();
-
-    /**
-     * Returns information about the media, artist, title. This function can be
-     * called multiple times but it only needs to have valid metadata after open
-     * has been called. It must never return null.
-     *
-     * @return
-     */
-//    public SongMetadata getMetadata();
     
 }

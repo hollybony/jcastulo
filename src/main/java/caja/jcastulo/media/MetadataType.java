@@ -1,6 +1,7 @@
 package caja.jcastulo.media;
 
 /**
+ * Media metadata fields
  * 
  * @author Carlos Juarez
  */

@@ -8,7 +8,7 @@ import org.springframework.util.StringUtils;
 
 /**
  * Controls when a full meta data chunk should be rendered and in which format.
- * see http://sphere.sourceforge.net/flik/docs/streaming.html
+ * @see http://sphere.sourceforge.net/flik/docs/streaming.html
  * 
  * @author bysse
  *
@@ -26,8 +26,14 @@ public class MetadataManager{
      */
     private final static int MAXIMUM_METADATA_LENGTH = 4080;
     
+    /**
+     * To match fields in the song format
+     */
     private final static Pattern FIELD = Pattern.compile("(\\$\\{([^\\}\\$]+)\\})|(\\$([^\\s\\?\\$]+))");
     
+    /**
+     * Condition pattern
+     */
     private final static Pattern CONDITION = Pattern.compile("\\?\\(([^,]+),([^\\)]+)\\)");
     
     /**
@@ -63,9 +69,10 @@ public class MetadataManager{
     }
 
     /**
-     * Sets and renders new meta data with the current format.Winamp complaints if there is no a ; at the end
-     *
-     * @param metadata
+     * Sets and renders new meta data with the current format. Winamp complaints if there is no a ; at the end
+     * that is why ; is added
+     * 
+     * @param metadata - song metadata to set
      */
     public final synchronized void setMetadata(final SongMetadata metadata) {
         if(currentMetadata!=null && currentMetadata.equals(metadata)){
@@ -83,9 +90,10 @@ public class MetadataManager{
     
     /**
      * TODO probably the control with lastMetadataChunk is not suitable as different clients could require meta data in less than 15 sec.
+     * Encodes the current metadata string representation to byte array. The bytes array length will be 1 + 16 multiple
+     * where 1 is the number of 16 blocks
      * 
-     * Formats and returns a byte array containing meta data information
-     * @return
+     * @return the bytes array
      */
     public synchronized byte[] getBytesMetaData() {
         long time = System.currentTimeMillis();
@@ -114,7 +122,7 @@ public class MetadataManager{
             for (int i = metadataLenth + 1; i < blockLength; i++) {
                 result[i] = 0;
             }
-            logger.debug("send metadata bytes: 16 byte length=" + result[0] + ", content=[" + new String(result) + "]");
+            logger.trace("send metadata bytes: 16 byte length=" + result[0] + ", content=[" + new String(result) + "]");
             return result;
         } else {
 //            logger.debug("Sending zero length metadata chunk");
@@ -123,11 +131,11 @@ public class MetadataManager{
     }
 
     /**
-     * Renders the meta data string sent to the client.
+     * Creates a string representation of the song metadata meeting the format given
      *
-     * @param format
-     * @param metadata
-     * @return
+     * @param format - the format which the string will meet
+     * @param metadata - song metadata
+     * @return the string formatted
      */
     protected String parseFormat(final String format, final SongMetadata metadata) {
         String result = format;
