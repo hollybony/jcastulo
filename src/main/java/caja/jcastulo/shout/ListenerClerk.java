@@ -2,8 +2,8 @@ package caja.jcastulo.shout;
 
 import caja.jcastulo.media.Frame;
 import caja.jcastulo.shout.http.Request;
-import caja.jcastulo.stream.NoLoadedFrameException;
 import caja.jcastulo.stream.EmptyFrameStorageException;
+import caja.jcastulo.stream.NoLoadedFrameException;
 import caja.jcastulo.stream.OldFrameException;
 import caja.jcastulo.stream.StreamProvider;
 import caja.jcastulo.stream.TimedFrame;
@@ -59,9 +59,9 @@ public class ListenerClerk implements Runnable {
         streamProvider = streamProviderResolver.findStreamProvider(request);
         if (streamProvider == null) {
             writeNegativeResponse(socket.getOutputStream());
-            logger.error("client " + ip + ":" + port + " the mountpoint : [" + request.getPath() + "] does not exist");
+            logger.error("client " + ip + ":" + port + " the mountpoint : [" + request.getPath() + "] does not exist or is stopped");
             socket.close();
-            throw new IllegalRequestException("mountpoint " + request.getPath() + " does not exist");
+            throw new IllegalRequestException("mountpoint " + request.getPath() + " does not exist or is stopped");
         }
         clientSpec = new ClientSpec(ip, port, streamProvider.getMountPoint());
     }
@@ -103,6 +103,11 @@ public class ListenerClerk implements Runnable {
                     bytesSent += frame.getSize();
                 } catch (EmptyFrameStorageException ex) {
                     try {
+                        if(!streamProvider.isRunning()){
+                            logger.info("stream provider : " + streamProvider.getMountPoint() + " is not loner running");
+                            cleanup();
+                            return;
+                        }
                         logger.debug("client " + clientSpec.ipPlusPort() + " sleep for a while and let the StreamProvider fill the storage", ex.getMessage());
                         Thread.sleep(250);
                     } catch (InterruptedException ex1) {
@@ -125,7 +130,6 @@ public class ListenerClerk implements Runnable {
                 }
                 if (Thread.interrupted()) {
                     logger.info("client " + clientSpec.ipPlusPort() + " has been interrupted");
-                    
                 }
             }//end while
         }catch(java.net.SocketException ex){
