@@ -14,7 +14,7 @@
         <constructor-arg value="C:\temp\Alice In Chains- Brother.mp3"/>
     </bean>-->
     
-    <bean id="mediaReaderFactory" class="caja.jcastulo.media.MediaReaderFactory">
+    <bean id="mediaReaderFactory" class="caja.jcastulo.media.FrameIteratorFactory">
         <constructor-arg>
             <bean class="caja.jcastulo.media.audio.Mp3FrameIterator"/>
         </constructor-arg>
