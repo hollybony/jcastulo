@@ -12,38 +12,61 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 
 /**
- *
+ * Represents an audio media in a file system
+ * 
  * @author Carlos Juarez
  */
 @Entity
 @Table(name="AUDIO_MEDIAS")
 public class AudioMedia{
 
+    /**
+     * The pathname of the media file
+     */
     private String pathname;
     
-//    @Transient
+    /**
+     * The song metadata. It is a transient property
+     */
     private SongMetadata songMetadata;
 
+    /**
+     * Constructs an instance of <code>AudioMedia</code> class
+     */
     public AudioMedia() {
         this(null);
     }
 
-    public AudioMedia(String path) {
-        setPathname(path);
+    /**
+     * Constructs an instance of <code>AudioMedia</code> class
+     * 
+     * @param pathname - the pathname to set
+     */
+    public AudioMedia(String pathname) {
+        setPathname(pathname);
     }
     
+    /**
+     * @return the pathname
+     */
     @Id
     public String getPathname() {
         return pathname;
     }
 
-    public void setPathname(String filePath) {
-        if (filePath != null) {
-            songMetadata = SongMetadataFactory.createMedia(filePath);
+    /**
+     * @param pathname - the pathname to set
+     */
+    public void setPathname(String pathname) {
+        if (pathname != null) {
+            songMetadata = SongMetadataFactory.createMedia(pathname);
         }
-        pathname = filePath;
+        this.pathname = pathname;
     }
 
+    /**
+     * @return the songMetadata
+     */
     @Transient
     public SongMetadata getSongMetadata() {
         return songMetadata;
@@ -75,6 +98,5 @@ public class AudioMedia{
         }
         return true;
     }
-
     
 }
