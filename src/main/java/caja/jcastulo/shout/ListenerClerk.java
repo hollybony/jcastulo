@@ -104,7 +104,7 @@ public class ListenerClerk implements Runnable {
                 } catch (EmptyFrameStorageException ex) {
                     try {
                         if(!streamProvider.isRunning()){
-                            logger.info("stream provider : " + streamProvider.getMountPoint() + " is not loner running");
+                            logger.info("stream provider : " + streamProvider.getMountPoint() + " is not longer running");
                             cleanup();
                             return;
                         }
