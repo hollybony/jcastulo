@@ -3,11 +3,16 @@ package caja.jcastulo.media.audio;
 import org.slf4j.LoggerFactory;
 
 /**
+ * Represents an Mp3 frame header (by setting data @see setData method) and provides all the encoded methods
+ * necessary to know the details about the header
  * 
  * @author Carlos Juarez
  */
 public class Mp3FrameHeader {
     
+    /**
+     * The logger
+     */
     final org.slf4j.Logger logger = LoggerFactory.getLogger(Mp3FrameHeader.class);
 
     /**
@@ -18,9 +23,9 @@ public class Mp3FrameHeader {
      * The first byte represents a 0xFF is just a marker
      * 
      * 
-     * http://sphere.sourceforge.net/flik/docs/streaming.html
-     * http://jicyshout.sourceforge.net/oreilly-article/java-streaming-mp3-pt2/java-streaming-mp3-pt2.html
-     * http://jicyshout.sourceforge.net/oreilly-article/java-streaming-mp3-pt1/java-streaming-mp3-pt1.html
+     * @see http://sphere.sourceforge.net/flik/docs/streaming.html
+     * @see http://jicyshout.sourceforge.net/oreilly-article/java-streaming-mp3-pt2/java-streaming-mp3-pt2.html
+     * @see http://jicyshout.sourceforge.net/oreilly-article/java-streaming-mp3-pt1/java-streaming-mp3-pt1.html
      * 
      * 
      */
@@ -67,21 +72,26 @@ public class Mp3FrameHeader {
         {448,   384,    320,    256,    160},
         {-1,     -1,     -1,     -1,     -1}};
     
+    /**
+     * if the frame is constant bitrate
+     */
     private boolean cbr = false;
 
+    /**
+     * The fixed frame size only apply when the frame is constant bitrate
+     */
     private int fixedFrameSize;
     
+    /**
+     * Constructs an instance of <code>Mp3FrameHeader</code> class
+     */
     public Mp3FrameHeader() {
     }
 
-//    public void setData(byte[] data) {
-//        for(int i = 0; i < 4; i++) {
-//            header[i] = data[i];
-//        }
-//    }
-
     /**
-     * Sets the all four bytes that represent the header
+     * Sets the all four bytes that represent the header. By setting this data all the getters methods will return
+     * updated values according this new data
+     * 
      * @param b1
      * @param b2
      * @param b3
@@ -146,6 +156,9 @@ public class Mp3FrameHeader {
         return bitRateTable[index][index2] * 1000;
     }
 
+    /**
+     * @return if the frame is padded
+     */
     public boolean isPadded() {
         return (header[2] & 0x2) == 2;
     }
@@ -162,29 +175,43 @@ public class Mp3FrameHeader {
         return sampleRateTable[index][version];
     }
 
+    /**
+     * @return the channel mode
+     */
     public int getChannelMode() {
         return ((header[3] & 0xC0) >> 6);
     }
 
+    /**
+     * @return the mode extension
+     */
     public int getModeExtension() {
         return ((header[3] & 0x30) >> 4);
     }
 
+    /**
+     * @return <code>true</code> if the frame is copyright protected
+     */
     public boolean isCopyrighted() {
         return (header[3] & 0x08) != 0;
     }
 
+    /**
+     * @return <code>true</code> if this is not a copied file
+     */
     public boolean isOriginal() {
         return (header[3] & 0x04) != 0;
     }
 
+    /**
+     * @return the emphasis
+     */
     public int getEmphasis() {
         return (header[3] & 0x03);
     }
 
     /**
-     * 
-     * @return 
+     * @return the frame size in bytes
      */
     public int getFrameSize() {
         if(isCbr()){
@@ -204,22 +231,37 @@ public class Mp3FrameHeader {
         }
     }
 
+    /**
+     * @return the offset byte within the file
+     */
     public long getOffset() {
         return offset;
     }
 
+    /**
+     * @param offset - the offset to set
+     */
     public void setOffset(long offset) {
         this.offset = offset;
     }
 
+    /**
+     * @return <code>true</code> if it is constant bitrates
+     */
     public boolean isCbr() {
         return cbr;
     }
 
+    /**
+     * @param cbr - set if it is a constant bitrate
+     */
     public void setCbr(boolean cbr) {
         this.cbr = cbr;
     }
 
+    /**
+     * @param fixedFrameSize - fixedFrameSize to set only applicable when cbr is <code>true</code>
+     */
     public void setFixedFrameSize(int fixedFrameSize) {
         this.fixedFrameSize = fixedFrameSize;
     }

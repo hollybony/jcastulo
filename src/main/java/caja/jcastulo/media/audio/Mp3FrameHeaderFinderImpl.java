@@ -9,11 +9,15 @@ import java.io.IOException;
 import org.slf4j.LoggerFactory;
 
 /**
- *
+ * Default implementation of <code>Mp3FrameHeaderFinder</code> 
+ * 
  * @author Carlos Juarez
  */
 public class Mp3FrameHeaderFinderImpl implements Mp3FrameHeaderFinder{
     
+    /**
+     * The logger
+     */
     final org.slf4j.Logger logger = LoggerFactory.getLogger(Mp3FrameHeaderFinderImpl.class);
 
 //    @Override
@@ -36,6 +40,13 @@ public class Mp3FrameHeaderFinderImpl implements Mp3FrameHeaderFinder{
 //        }
 //    }
     
+    /**
+     * It takes into account the 3 first bytes to determine whether a header has been found
+     * @param currentHeader
+     * @param byteStreamReader
+     * @return
+     * @throws IOException 
+     */
     @Override
     public long findNextHeader(Mp3FrameHeader currentHeader, ByteStreamReader byteStreamReader) throws IOException {
         byte byte2 = 0;

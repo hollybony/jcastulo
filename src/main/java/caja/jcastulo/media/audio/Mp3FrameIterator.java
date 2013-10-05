@@ -15,20 +15,38 @@ import org.slf4j.LoggerFactory;
  * 128kbps 44.1kHz layer II uses a lot of 418 bytes and some of 417 bytes long.
  * Regardless of the bitrate of the file, a frame in an MPEG-1 file lasts for 26ms (26/1000 of a second).
  * 
+ * An instance of this class cannot be share through different threads as it represents in someway a file which
+ * is being reading
+ * 
  * It uses jaudiotagger to get the metadata
  * 
  * @author Carlos Juarez
  */
 public class Mp3FrameIterator implements FrameIterator {
 
+    /**
+     * The logger
+     */
     final org.slf4j.Logger logger = LoggerFactory.getLogger(Mp3FrameIterator.class);
     
+    /**
+     * The byteStreamReader
+     */
     private ByteStreamReader byteStreamReader;
     
+    /**
+     * The currentHeader
+     */
     private Mp3FrameHeader currentHeader = new Mp3FrameHeader();
     
+    /**
+     * The frameHeaderFinder
+     */
     private Mp3FrameHeaderFinder frameHeaderFinder = new Mp3FrameHeaderFinderImpl();
     
+    /**
+     * Constructs an instance of <code>Mp3FrameIterator</code> class
+     */
     public Mp3FrameIterator() {
         super();
     }
@@ -42,9 +60,8 @@ public class Mp3FrameIterator implements FrameIterator {
     }
 
     /**
-     * With this method the life cycle starts
-     * The media data is retrieved by using
-     * The media file is read
+     * With this method the life cycle starts. The media data is retrieved and is ready to be read
+     * by using byteStreamReader
      */
     @Override
     public void open(AudioMedia media) throws IOException {
@@ -111,6 +128,13 @@ public class Mp3FrameIterator implements FrameIterator {
         }
     }
     
+    /**
+     * Opens and setup the byteStreamReader with the media pointed by pathname
+     * 
+     * @param pathname
+     * @return
+     * @throws FileNotFoundException 
+     */
     private ByteStreamReader buildByteStreamReader(String pathname) throws FileNotFoundException{
         ByteStreamReader streamReader = new ByteStreamReader();
         logger.debug("openning media : " + pathname);

@@ -12,6 +12,9 @@ import java.util.Map;
  */
 public class SongMetadata {
 
+    /**
+     * Map with the metadata fields
+     */
     private Map<MetadataType, String> data = new EnumMap<MetadataType, String>(MetadataType.class);
     
     public SongMetadata(String artist, String album, String title){
@@ -20,16 +23,31 @@ public class SongMetadata {
         data.put(MetadataType.TITLE, title);
     }
     
+    /**
+     * Sets a new metadata if this already exists then it'll replace the old one
+     * 
+     * @param metadataType - the metadataType
+     * @param value - the new value
+     */
     public void set(MetadataType metadataType, String value){
         data.put(metadataType, value);
     }
 
-    public boolean has(MetadataType type) {
-        return data.containsKey(type);
+    /**
+     * 
+     * @param metadataType - to look for
+     * @return <code>true</code> if metadata was found
+     */
+    public boolean has(MetadataType metadataType) {
+        return data.containsKey(metadataType);
     }
 
-    public String get(MetadataType type) {
-        return data.get(type);
+    /**
+     * @param metadataType - metadataType to look for
+     * @return the metadataType found or null if it was not found
+     */
+    public String get(MetadataType metadataType) {
+        return data.get(metadataType);
     }
 
     @Override
