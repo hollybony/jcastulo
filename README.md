@@ -6,4 +6,5 @@ Shoutcast server implemented with Java
 
 Next fixes/improvements
 - Complete java doc
-- option of using a file/in memory database
+- Option of using a file/in memory database
+- Enable streaming to browser clients
