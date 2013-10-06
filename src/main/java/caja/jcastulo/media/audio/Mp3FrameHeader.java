@@ -43,7 +43,7 @@ public class Mp3FrameHeader {
         {0, 44100, 22050, 11025},
         {0, 48000, 24000, 12000},
         {0, 32000, 16000, 8000},
-        {0, 0, 0, 0}};
+        {0, 0,     0,     0}};
     
     /**
      * V1 L1, V1 L2, V1 L3, V2 L1, V2 L2 & L3 which mean
@@ -108,7 +108,7 @@ public class Mp3FrameHeader {
         return header;
     }
 
-    /*
+    /**
      * Found in 20,19 bits
      * 
      * AAAAAAAA AAABBCCD EEEEFFGH IIJJKLMM
@@ -118,20 +118,59 @@ public class Mp3FrameHeader {
      * 
      * 0x18 => 00011000 so with bitwise AND we would get bits 20 and 19
      * then with >>3 we remove the first 3 bits
+     * <table border="1">
+     * <thead>
+     * <td>Mpeg version values</td><td>Return</td>
+     * </thead>
+     * <tr>
+     * <td>00 - MPEG Version 2.5 (later extension of MPEG 2)</td><td>4</td>
+     * </tr>
+     * <tr>
+     * <td>01 - reserved</td><td>3</td>
+     * </tr>
+     * <tr>
+     * <td>10 - MPEG Version 2 (ISO/IEC 13818-3)</td><td>2</td>
+     * </tr>
+     * <tr>
+     * <td>11 - MPEG Version 1 (ISO/IEC 11172-3)</td><td>1</td>
+     * </tr>
+     * </table>
      * 
      * 7 6 5 4 3 2 1 0 128 64 32 16 8 4 2 1 0x80 0x40 0x20 0x10 0x08 0x04 0x02
      * 0x01
      * 
      * A = 10 B = 11 C = 12 D = 13 E = 14 F = 15
      * 
-     * @return 
+     * @return mpeg version which is a value between 4 and 1
      */
     public int getMPEGVersion() {
         return 4 - ((header[1] & 0x18) >> 3);
     }
 
     /**
-     * 
+     * <table border="1">
+     * <thead>
+     * <td>Layer description</td>
+     * <td>return</td>
+     * </thead>
+     * <tr>
+     * <td>00 - reserved</td>
+     * <td>4</td>
+     * </tr>
+     * <tr>
+     * <td>01 - Layer III</td>
+     * <td>3</td>
+     * </tr>
+     * </tr>
+     * <tr>
+     * <td>10 - Layer II</td>
+     * <td>2</td>
+     * </tr>
+     * <tr>
+     * <td>11 - Layer I</td>
+     * <td>1</td>
+     * </tr>
+     * </table>
      * @return layer description between 1 and 4
      */
     public int getLayerDescription() {
@@ -143,10 +182,11 @@ public class Mp3FrameHeader {
     }
 
     /**
-     * The bitrate is getting from the header byte that represents the MPEG version
+     * The bit rate is getting from the header byte that represents the MPEG version
      * 0xF0 => 11110000
      * >>4 remove the 4 first bits
-     * @return 
+     * 
+     * @return bit rate
      */
     public int getBitRate() {
         int index = (header[2] & 0xf0) >> 4;
@@ -172,7 +212,16 @@ public class Mp3FrameHeader {
             return 0;
         }
         int version = getMPEGVersion();
-        return sampleRateTable[index][version];
+        //in case mpeg version 2.5 but we have never seen it
+        if(version==4){
+            version=3;
+        }
+        try{
+            int sampleRate = sampleRateTable[index][version];
+            return sampleRate;
+        }catch(ArrayIndexOutOfBoundsException ex){
+            throw new RuntimeException("row column : " + index + "," + version + " are out of sample rate matrix", ex);
+        }
     }
 
     /**
@@ -220,10 +269,10 @@ public class Mp3FrameHeader {
             int bitrate = getBitRate();
             int samplerate = getSampleRate();
             int padding = isPadded() ? 1 : 0;
-            if(samplerate + padding==0){
-                throw new RuntimeException("samplerate + padding = " + (samplerate + padding) + " it would cause / by zero");
+            if(samplerate==0){
+                throw new RuntimeException("samplerate = " + samplerate + " it would cause / by zero at the frame : " + offset);
             }
-            if(getLayerDescription()==1 || getLayerDescription()==4){
+            if(getLayerDescription()==4){
                 logger.warn("layer description not allowed = " + getLayerDescription());
             }
             
