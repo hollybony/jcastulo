@@ -5,7 +5,7 @@
 package caja.jcastulo.gui;
 
 import caja.gui.utils.WaitDialog;
-import caja.jcastulo.shout.ListenerClerksManager;
+import caja.jcastulo.shout.ListenerClerkManager;
 import caja.jcastulo.shout.ShoutServer;
 import caja.jcastulo.stream.StreamManager;
 import caja.jcastulo.stream.services.StreamManagersService;
@@ -65,7 +65,7 @@ public class Main extends javax.swing.JFrame {
         listenersPanel = new caja.jcastulo.gui.ListenersPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("JCast Console");
+        setTitle("JCastulo");
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
                 formWindowClosing(evt);
@@ -215,7 +215,7 @@ public class Main extends javax.swing.JFrame {
         //init Spring IoC
         context = new ClassPathXmlApplicationContext(new String[]{"META-INF/spring/datasource.xml", "META-INF/spring/jpa-tx-config.xml", "META-INF/spring/jpa-service-context.xml", "META-INF/spring/root-context.xml"});
         serverPanel.setShoutServer(context.getBean("shoutServer", ShoutServer.class));
-        listenersPanel.setListenersManager(context.getBean("listenersManager", ListenerClerksManager.class));
+        listenersPanel.setListenersManager(context.getBean("listenersManager", ListenerClerkManager.class));
         final StreamManagersService streamManagersService = context.getBean("streamManagersService", StreamManagersService.class);
         streamsPanel.setStreamManagersService(streamManagersService);
         streamsPanel.getStreamsTable().getSelectionModel().addListSelectionListener(new ListSelectionListener() {

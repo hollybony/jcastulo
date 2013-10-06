@@ -5,7 +5,7 @@
 package caja.jcastulo.gui;
 
 import caja.jcastulo.shout.ClientSpec;
-import caja.jcastulo.shout.ListenerClerksManager;
+import caja.jcastulo.shout.ListenerClerkManager;
 import caja.jcastulo.shout.ListenerUpdatesListener;
 import java.util.List;
 import javax.swing.SwingUtilities;
@@ -21,7 +21,7 @@ public class ListenersPanel extends javax.swing.JPanel {
     /**
      * The listenerClerksManager
      */
-    private ListenerClerksManager listenersManager;
+    private ListenerClerkManager listenersManager;
     
     /**
      * The current mountPoint for which its listeners will be showed
@@ -74,7 +74,7 @@ public class ListenersPanel extends javax.swing.JPanel {
      */
     private void refresh(){
         DefaultTableModel model = (DefaultTableModel) jTable.getModel();
-        List<ClientSpec> clientSpecs = listenersManager.getListenerClerksByMountpoint(currentMountPoint);
+        List<ClientSpec> clientSpecs = listenersManager.getClientSpecsByMountpoint(currentMountPoint);
         model.setRowCount(0);
         for(ClientSpec clientSpec : clientSpecs){
             model.addRow(new Object[]{clientSpec.getIp(),clientSpec.getPort()});
@@ -84,7 +84,7 @@ public class ListenersPanel extends javax.swing.JPanel {
     /**
      * @param listenersManager - the listenersManager to set
      */
-    public void setListenersManager(ListenerClerksManager listenersManager) {
+    public void setListenersManager(ListenerClerkManager listenersManager) {
         this.listenersManager = listenersManager;
         this.listenersManager.addListenerUpdatesListener(listener);
     }
