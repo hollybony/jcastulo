@@ -16,37 +16,63 @@ import java.util.concurrent.TimeUnit;
 import org.slf4j.LoggerFactory;
 
 /**
- *
+ * <code>ListenerClerkManager</code> implementation that uses one to one strategy which means there will
+ * be a dedicated thread for every listener
+ * 
  * @author Carlos Juarez
  */
-public class ListenerClerksManagerImpl implements ListenerClerksManager {
+public class OneToOneClerkManager implements ListenerClerkManager {
 
-    final org.slf4j.Logger logger = LoggerFactory.getLogger(ListenerClerksManagerImpl.class);
+    /**
+     * The logger
+     */
+    final org.slf4j.Logger logger = LoggerFactory.getLogger(OneToOneClerkManager.class);
     
+    /**
+     * The streamProviderResolver
+     */
     protected StreamProviderResolver streamProviderResolver;
     
-    private List<TaskHolder> taskHolders;
+    /**
+     * The task holders to keep track of all the tasks
+     */
+    private final List<TaskHolder> taskHolders;
     
+    /**
+     * The doneCallback to remove the taskHolder and notify listeners
+     */
     private ListenerClerk.DoneCallback doneCallback;
     
+    /**
+     * The executorService
+     */
     private ExecutorService executorService;
     
+    /**
+     * The listeners that will be notified when updates come
+     */
     private List<ListenerUpdatesListener> listeners;
     
+    /**
+     * The number of listener that can be at the same time
+     */
     private int numConcurrentThreads = 5;
 
-    public ListenerClerksManagerImpl() {
+    /**
+     * Constructs an instance of <code>OneToOneClerkManager</code> class
+     */
+    public OneToOneClerkManager() {
         taskHolders = Collections.synchronizedList(new ArrayList<TaskHolder>());
         doneCallback = new ListenerClerk.DoneCallback() {
             @Override
-            public void done(ListenerClerk shoutRunnable) {
+            public void done(ListenerClerk listenerClerk) {
                 ListIterator<TaskHolder> iterator = taskHolders.listIterator();
                 while (iterator.hasNext()) {
                     TaskHolder next = iterator.next();
-                    if (next.clientSpec.equals(shoutRunnable.getClientSpec())) {
+                    if (next.clientSpec.equals(listenerClerk.getClientSpec())) {
                         taskHolders.remove(next);
                         for(ListenerUpdatesListener listener : listeners){
-                            listener.listenerHasGone(shoutRunnable.getClientSpec());
+                            listener.listenerHasGone(listenerClerk.getClientSpec());
                         }
                     }
                 }
@@ -56,8 +82,13 @@ public class ListenerClerksManagerImpl implements ListenerClerksManager {
         listeners = new ArrayList<ListenerUpdatesListener>();
     }
 
+    /**
+     * A new ListenerClerk is created and send to the thread pool
+     * 
+     * @param clientSocket 
+     */
     @Override
-    public void createAndRunListenerClerk(Socket clientSocket) {
+    public void attendListener(Socket clientSocket) {
         ListenerClerk shoutRunnable;
         try {
             shoutRunnable = new ListenerClerk(streamProviderResolver, clientSocket, doneCallback);
@@ -78,6 +109,12 @@ public class ListenerClerksManagerImpl implements ListenerClerksManager {
         }
     }
 
+    /**
+     * The executor service is shutdown
+     * 
+     * @return
+     * @throws InterruptedException 
+     */
     @Override
     public boolean shutdown() throws InterruptedException {
         executorService.shutdown();//disable new tasks from being submitted
@@ -94,8 +131,13 @@ public class ListenerClerksManagerImpl implements ListenerClerksManager {
         return false;
     }
 
+    /**
+     * The future task of the given clientSpec is canceled
+     * 
+     * @param clientSpec 
+     */
     @Override
-    public void shutdownListenerClerk(ClientSpec clientSpec) {
+    public void shutdownListener(ClientSpec clientSpec) {
         ListIterator<TaskHolder> iterator = taskHolders.listIterator();
         while (iterator.hasNext()) {
             TaskHolder taskHolder = iterator.next();
@@ -105,16 +147,22 @@ public class ListenerClerksManagerImpl implements ListenerClerksManager {
         }
     }
 
+    /**
+     * @return the streamProviderResolver
+     */
     public StreamProviderResolver getStreamProviderResolver() {
         return streamProviderResolver;
     }
 
+    /**
+     * @param streamProviderResolver - the streamProviderResolver to set
+     */
     public void setStreamProviderResolver(StreamProviderResolver streamProviderResolver) {
         this.streamProviderResolver = streamProviderResolver;
     }
 
     @Override
-    public List<ClientSpec> getListenerClerksByMountpoint(String mountpoint) {
+    public List<ClientSpec> getClientSpecsByMountpoint(String mountpoint) {
         List<ClientSpec> listenersFound = new ArrayList<ClientSpec>();
         for (TaskHolder taskHolder : taskHolders) {
             if (taskHolder.clientSpec.getMountpoint().equals(mountpoint)) {
@@ -124,26 +172,50 @@ public class ListenerClerksManagerImpl implements ListenerClerksManager {
         return listenersFound;
     }
 
+    /**
+     * @param listenerUpdatesListener a new listenerUpdatesListener to add
+     */
     @Override
     public void addListenerUpdatesListener(ListenerUpdatesListener listenerUpdatesListener) {
         listeners.add(listenerUpdatesListener);
     }
 
+    /**
+     * @param listenerUpdatesListener - the listenerUpdatesListener to be removed
+     */
     @Override
     public void removeListenerUpdatesListener(ListenerUpdatesListener listenerUpdatesListener) {
         listeners.remove(listenerUpdatesListener);
     }
 
+    /**
+     * @param numConcurrentThreads - numConcurrentThreads to set
+     */
     public void setNumConcurrentThreads(int numConcurrentThreads) {
         this.numConcurrentThreads = numConcurrentThreads;
     }
 
+    /**
+     * Holder of the future task for a give client
+     */
     class TaskHolder {
 
+        /**
+         * The futureTask
+         */
         final FutureTask<?> futureTask;
         
+        /**
+         * The clientSpec
+         */
         final ClientSpec clientSpec;
 
+        /**
+         * Constructs an instance of <code>TaskHolder</code> class
+         * 
+         * @param futureTask - futureTask to set
+         * @param clientSpec - clientSpec to set
+         */
         TaskHolder(FutureTask<?> futureTask, ClientSpec clientSpec) {
             this.futureTask = futureTask;
             this.clientSpec = clientSpec;

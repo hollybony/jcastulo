@@ -23,7 +23,6 @@ class PreloadStreamDataReader implements DataReader {
      */
     private static final long MAXIMUM_HISTORY = 5000;
 
-
     /**
      *
      */

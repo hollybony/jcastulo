@@ -14,11 +14,15 @@ import java.net.Socket;
 import org.slf4j.LoggerFactory;
 
 /**
+ * Clerk that attends a particular client socket providing frame bytes
  * 
  * @author Carlos Juarez
  */
 public class ListenerClerk implements Runnable {
 
+    /**
+     * The logger
+     */
     final org.slf4j.Logger logger = LoggerFactory.getLogger(ListenerClerk.class);
     
     /**
@@ -26,23 +30,53 @@ public class ListenerClerk implements Runnable {
      * client example
      */
     private static final int METADATA_INTERVAL = 65536;
-        
-    private Socket socket;
-        
-    private ClientSpec clientSpec;
     
-//    protected final SimpleDateFormat dateFormat = new SimpleDateFormat("h:mm:ss a");
+    /**
+     * The client socket
+     */
+    private Socket socket;
+    
+    /**
+     * The client specification
+     */
+    private ClientSpec clientSpec;
 
+    /**
+     * A hook that is called when closing the client connection
+     */
     private DoneCallback doneCallback;
     
+    /**
+     * The client request
+     */
     private Request request;
     
+    /**
+     * The stream provider
+     */
     private StreamProvider streamProvider;
     
+    /**
+     * Constructs an instance of <code>ListenerClerk</code> class
+     * 
+     * @param streamProviderResolver - streamProviderResolver to set
+     * @param clientSocket - clientSocket to set
+     * @throws IOException
+     * @throws IllegalRequestException 
+     */
     public ListenerClerk(StreamProviderResolver streamProviderResolver, Socket clientSocket) throws IOException, IllegalRequestException {
         this(streamProviderResolver, clientSocket, null);
     }
     
+    /**
+     * Constructs an instance of <code>ListenerClerk</code> class
+     * 
+     * @param streamProviderResolver - streamProviderResolver to set
+     * @param clientSocket - clientSocket to set
+     * @param doneCallback - doneCallback to set
+     * @throws IOException
+     * @throws IllegalRequestException 
+     */
     public ListenerClerk(StreamProviderResolver streamProviderResolver, Socket clientSocket, DoneCallback doneCallback) throws IOException, IllegalRequestException {
         this.socket = clientSocket;
         this.doneCallback = doneCallback;
@@ -66,13 +100,16 @@ public class ListenerClerk implements Runnable {
         clientSpec = new ClientSpec(ip, port, streamProvider.getMountPoint());
     }
 
+    /**
+     * Writes frame bytes into the client socket as well as meta data
+     */
     @Override
     public void run() {
         logger.info("client " + clientSpec.ipPlusPort() + " has started");
         try {
             OutputStream out = socket.getOutputStream();
             //writes the suitable http message on out
-            sendStartStreamResponse(streamProvider.getStreamName(), request, out);
+            writeStartStreamResponse(streamProvider.getStreamName(), request, out);
             //stars reading the frames
             TimedFrame timedFrame;
             long time = System.currentTimeMillis();
@@ -142,6 +179,9 @@ public class ListenerClerk implements Runnable {
         }
     }
 
+    /**
+     * Performs cleanup such as close client socket and all stuff
+     */
     private void cleanup(){
         logger.info("client " + clientSpec.ipPlusPort() + " cleanning up");
         try {
@@ -155,18 +195,26 @@ public class ListenerClerk implements Runnable {
         }
     }
     
+    /**
+     * Writes error code
+     * 
+     * @param out - where the error code is written
+     * @throws IOException 
+     */
     protected void writeNegativeResponse(OutputStream out) throws IOException {
         out.write("404 Not found".getBytes());
     }
 
     /**
+     * Writes the success initial stream response
+     * 
      * Every name-value pair is separated by CRLF
      *
-     * @param name
-     * @param out
+     * @param name which is used as the icy name
+     * @param out - where the response is written
      * @throws IOException
      */
-    protected void sendStartStreamResponse(String name, Request request, OutputStream out) throws IOException {
+    protected void writeStartStreamResponse(String name, Request request, OutputStream out) throws IOException {
         StringBuilder response = new StringBuilder();
         response.append("ICY 200 OK\r\n");
         // add the stream name
@@ -185,9 +233,10 @@ public class ListenerClerk implements Runnable {
     }
 
     /**
-     *
-     * @param in
-     * @return
+     * Retrieves the bytes representing the header from the inputStream and creates a <code>Request</code>
+     * 
+     * @param in - where the request bytes are looked for
+     * @return the request created
      * @throws IOException
      */
     private static Request readRequest(InputStream in) throws IOException, IllegalRequestException {
@@ -210,12 +259,18 @@ public class ListenerClerk implements Runnable {
         return new Request(sb.toString());
     }
 
+    /**
+     * @return client specification
+     */
     public ClientSpec getClientSpec() {
         return clientSpec;
     }
     
+    /**
+     * Call back to be called when closing client connection
+     */
     public interface DoneCallback{
-        public void done(ListenerClerk shoutRunnableDone);
+        public void done(ListenerClerk listenerClerk);
     }
 
 }

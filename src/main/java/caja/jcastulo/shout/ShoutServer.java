@@ -18,7 +18,7 @@ public class ShoutServer implements Runnable, ServerObservable {
     
     private ServerSocket serverSocket;
         
-    protected ListenerClerksManager shoutRunnableManager;
+    protected ListenerClerkManager shoutRunnableManager;
     
     protected int port;
     
@@ -26,7 +26,7 @@ public class ShoutServer implements Runnable, ServerObservable {
     
     private List<ServerListener> serverListeners;
 
-    public ShoutServer(ListenerClerksManager shoutRunnableManager, int serverPort) {
+    public ShoutServer(ListenerClerkManager shoutRunnableManager, int serverPort) {
         this.shoutRunnableManager = shoutRunnableManager;
         this.port = serverPort;
         serverListeners = new ArrayList<ServerListener>();
@@ -59,7 +59,7 @@ public class ShoutServer implements Runnable, ServerObservable {
         while (true) {
             try {
                 Socket clientSocket = serverSocket.accept();
-                shoutRunnableManager.createAndRunListenerClerk(clientSocket);
+                shoutRunnableManager.attendListener(clientSocket);
             } catch (SocketException ex) {
                 if (Thread.interrupted()) {
                     cleanup();

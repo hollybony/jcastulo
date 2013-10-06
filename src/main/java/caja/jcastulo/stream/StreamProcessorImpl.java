@@ -14,51 +14,100 @@ import org.slf4j.LoggerFactory;
 
 /**
  *
- * <code>StreamProcessorImpl</code> abstract implementation
+ * Default implementation of <code>StreamUpdatable</code>
  *
  * @author Carlos Juarez
  */
 public class StreamProcessorImpl implements StreamUpdatable {
 
+    /**
+     * The logger
+     */
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(StreamProcessorImpl.class);
     
+    /**
+     * The frame storage
+     */
     protected final FrameStorage frameStorage = new FrameStorage();
     
+    /**
+     * The current frame iterator
+     */
     private FrameIterator frameIterator;
     
-    private FrameIteratorFactory mediaReaderFactory;
+    /**
+     * The frameIteratorFactory
+     */
+    private FrameIteratorFactory frameIteratorFactory;
     
+    /**
+     * The streamSpec
+     */
     private StreamSpec streamSpec;
     
+    /**
+     * The streamListeners
+     */
     private List<StreamListener> streamListeners;
     
+    /**
+     * The dataReader
+     */
     private final DataReader dataReader;
     
+    /**
+     * The metadataManager
+     */
     private MetadataManager metadataManager;
 
+    /**
+     * Different internal StreamProcessor status
+     */
     private enum Status {
         STOPPED, PLAYING, CURRENT_MEDIA_CHANGE_REQUESTED, PLAYING_SILENCE
     };
+    
+    /**
+     * The current status
+     */
     private Status status = Status.STOPPED;
 
+    /**
+     * Constructs an instance of <code>StreamProcessorImpl</code> class
+     * 
+     * @param streamSpec - the streamSpec to set
+     */
     public StreamProcessorImpl(StreamSpec streamSpec) {
         this(streamSpec, new PreloadStreamDataReader());
     }
 
+    /**
+     * Constructs an instance of <code>StreamProcessorImpl</code> class
+     * 
+     * @param streamSpec - the streamSpec to set
+     * @param dataReader - the dataReader to set
+     */
     public StreamProcessorImpl(StreamSpec streamSpec, DataReader dataReader) {
         this(streamSpec, dataReader, new FrameIteratorFactory());
     }
 
+    /**
+     * Constructs an instance of <code>StreamProcessorImpl</code> class
+     * 
+     * @param streamSpec - the streamSpec to set
+     * @param dataReader - the dataReader to set
+     * @param mediaReaderFactory - the mediaReaderFactory to set
+     */
     public StreamProcessorImpl(StreamSpec streamSpec, DataReader dataReader, FrameIteratorFactory mediaReaderFactory) {
         this.streamSpec = streamSpec;
         metadataManager = new MetadataManager();
         streamListeners = new ArrayList<StreamListener>();
         this.dataReader = dataReader;
-        this.mediaReaderFactory = mediaReaderFactory;
+        this.frameIteratorFactory = mediaReaderFactory;
     }
 
     /**
-     *
+     * Runs the stream procesor until an interruption or error
      */
     @Override
     public void run() {
@@ -94,6 +143,9 @@ public class StreamProcessorImpl implements StreamUpdatable {
         }
     }
 
+    /**
+     * Performs cleanup. Clears frame storage and closes frameIterator
+     */
     protected synchronized void cleanup() {
         frameStorage.clear();
         if (frameIterator != null) {
@@ -167,6 +219,9 @@ public class StreamProcessorImpl implements StreamUpdatable {
         }
     }
     
+    /**
+     * Sets as current frameIterator a silent frame
+     */
     private void playSilence(){
         frameIterator = SilentMediaReader.getInstance();
         updateCurrentMedia(null);
@@ -176,10 +231,17 @@ public class StreamProcessorImpl implements StreamUpdatable {
         }
     }
     
+    /**
+     * Updates frame iterator with the one for the media at the top of the queue and update the metadatas
+     * 
+     * @throws IOException 
+     */
     private void playMedia() throws IOException{
-        frameIterator = mediaReaderFactory.getFrameIterator(streamSpec.getAudioMedias().get(0));
-        frameIterator.open(streamSpec.getAudioMedias().get(0));
-        updateCurrentMedia(streamSpec.getAudioMedias().get(0));
+        synchronized (streamSpec.getAudioMedias()) {
+            frameIterator = frameIteratorFactory.getFrameIterator(streamSpec.getAudioMedias().get(0));
+            frameIterator.open(streamSpec.getAudioMedias().get(0));
+            updateCurrentMedia(streamSpec.getAudioMedias().get(0));
+        }
         logger.info("now playing " + currentMetadata());
         status = Status.PLAYING;
         for (StreamListener listener : streamListeners) {
@@ -187,6 +249,12 @@ public class StreamProcessorImpl implements StreamUpdatable {
         }
     }
     
+    /**
+     * Handles exception when a media cannot be open. Updates the frame iterator with silent and set nothing playing
+     * as metadata
+     * 
+     * @param ex 
+     */
     private void processCurrentMediaError(Exception ex){
         logger.error(Thread.currentThread().getName() + " can't open [" + streamSpec.getAudioMedias().get(0) + "], skipping file", ex);
         consumeMedia(0);
@@ -198,6 +266,9 @@ public class StreamProcessorImpl implements StreamUpdatable {
         }
     }
     
+    /**
+     * @return the streamSpec
+     */
     @Override
     public StreamSpec getStreamSpec() {
         return streamSpec;
@@ -217,6 +288,12 @@ public class StreamProcessorImpl implements StreamUpdatable {
         }
     }
 
+    /**
+     * Removes a media from the queue
+     * 
+     * @param index - the index of the media being removed
+     * @return <code>true</code> if the medias was removed
+     */
     private boolean consumeMedia(int index) {
         synchronized (streamSpec.getAudioMedias()) {
             if (!streamSpec.getAudioMedias().isEmpty()) {
@@ -227,6 +304,11 @@ public class StreamProcessorImpl implements StreamUpdatable {
         }
     }
 
+    /**
+     * Adds a media to the queue and notifies listeners
+     * 
+     * @param media - the media to add
+     */
     @Override
     public void addMedia(AudioMedia media) {
         streamSpec.getAudioMedias().add(media);
@@ -235,6 +317,12 @@ public class StreamProcessorImpl implements StreamUpdatable {
         }
     }
 
+    /**
+     * Removes a media from the queue and notifies listeners. If the stream is running and the media to remove is
+     * playing this will be stopped and removed
+     * 
+     * @param index - index of the media to remove
+     */
     @Override
     public void removeMedia(final int index) {
         synchronized (this) {
@@ -251,9 +339,10 @@ public class StreamProcessorImpl implements StreamUpdatable {
     }
     
     /**
-     * first take off then put in
-     * @param sourceIndex
-     * @param targetIndex 
+     * Moves a media from one place to another in the queue and notifies listeners
+     * 
+     * @param sourceIndex - index where the media is taken
+     * @param targetIndex - index where the media is putted
      */
     @Override
     public void moveMedia(int sourceIndex, int targetIndex) {
@@ -283,30 +372,48 @@ public class StreamProcessorImpl implements StreamUpdatable {
         }
     }
     
+    /**
+     * Removes a listener from the list of listeners
+     * 
+     * @param listener - the listener to remove
+     */
     @Override
     public void removeListener(StreamListener listener) {
         streamListeners.remove(listener);
     }
 
+    /**
+     * @return the encoded bytes array from the current metadata
+     */
     @Override
     public byte[] currentMetadataBytes() {
         return metadataManager.getBytesMetaData();
     }
 
+    /**
+     * @return current metadata
+     */
     @Override
     public SongMetadata currentMetadata() {
         return metadataManager.getCurrentMetadata();
     }
 
+    /**
+     * @return the frameStorage
+     */
     @Override
     public FrameStorage getFrameStorage() {
         return frameStorage;
     }
 
+    /**
+     * Adds a stream listeners to the listeners list
+     * 
+     * @param listener - the listener to add
+     */
     @Override
     public void addListener(StreamListener listener) {
         streamListeners.add(listener);
     }
-
   
 }

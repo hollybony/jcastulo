@@ -8,16 +8,28 @@ import java.util.List;
 import org.slf4j.LoggerFactory;
 
 /**
- * Handles the mapping between a request and a SingleStreamProvider.
+ * Implementation of <code>StreamProviderResolver</code> that resolves the stream
+ * according the http request
  *
  * @author bysse
  */
 public class HttpStreamProviderResolver implements StreamProviderResolver<Request> {
 
+    /**
+     * The logger
+     */
     final org.slf4j.Logger logger = LoggerFactory.getLogger(HttpStreamProviderResolver.class);
     
+    /**
+     * The streamManagersService
+     */
     private StreamManagersService streamManagersService;
     
+    /**
+     * Constructs an instance of <code>HttpStreamProviderResolver</code> class
+     * 
+     * @param streamManagersService 
+     */
     public HttpStreamProviderResolver(StreamManagersService streamManagersService) {
         this.streamManagersService = streamManagersService;
     }

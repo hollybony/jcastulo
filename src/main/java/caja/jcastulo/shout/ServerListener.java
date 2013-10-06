@@ -5,11 +5,17 @@
 package caja.jcastulo.shout;
 
 /**
- *
+ * To receive server changing status
+ * 
  * @author Carlos Juarez
  */
 public interface ServerListener {
     
-        public void notifyNewServerStatus(final ServerObservable.ServerStatus serverStatus);
+    /**
+     * Called when the server has changed its status
+     * 
+     * @param serverStatus - the new status
+     */
+    public void notifyNewServerStatus(final ServerObservable.ServerStatus serverStatus);
         
 }
