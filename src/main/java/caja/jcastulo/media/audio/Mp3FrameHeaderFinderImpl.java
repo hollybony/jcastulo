@@ -55,10 +55,14 @@ public class Mp3FrameHeaderFinderImpl implements Mp3FrameHeaderFinder{
             byte byte1 = byte2;
             byte2 = byte3;
             byte3 = byteStreamReader.read();
+            byte layer =  (byte) ((byte2 & 0x06)>>1);
+            byte version = (byte) ((byte2 & 0x18)>>3);
+            byte sampleRate = (byte) ((byte3 & 0xC)>>2);
             // Check for the start of the Mp3 Frame Header 
-            //first byte must be FF the second must starts with 111, so with bitwise and 1110,0000
-            //is possible to know if the second byte starts with 111
-            if (byte1 == (byte) 0xFF && (byte2 & 0xE0) == 0xE0 && (byte3 & 0xF0)!=0xF0) {
+            //first byte must be FF
+            //second must starts with 111 (0XE0), so with bitwise AND 0XE0 we check if it starts with 111
+            //third byte must not start with 1111 which is wrong bit rate
+            if (byte1 == (byte) 0xFF && ((byte2 & 0xE0) == 0xE0 && version!=1 && layer!=0 && layer!=3) && (byte3 & 0xF0)!=0xF0 && sampleRate!=3) {
                 long oldOffset = currentHeader.getOffset();
                 currentHeader.setOffset(byteStreamReader.getOffset() - 3);
 //                try{
