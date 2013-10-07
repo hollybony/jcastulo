@@ -65,7 +65,7 @@ public class StreamManagersServiceMemory implements StreamManagersService{
         return null;
     }
 
-    public void persistStreamSpecs(){
+    public void flushStreamSpecs(){
         
     }
     

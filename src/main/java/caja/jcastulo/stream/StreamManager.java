@@ -9,13 +9,27 @@ import org.slf4j.LoggerFactory;
  */
 public class StreamManager implements StreamProvider{
 
+    /**
+     * The logger
+     */
     final org.slf4j.Logger logger = LoggerFactory.getLogger(StreamManager.class);
                         
-    private final StreamUpdatable processor;
-        
+    /**
+     * The stream processor that supports updates
+     */
+    private final StreamUpdateable processor;
+    
+    /**
+     * The thread where the stream manager runs
+     */
     private Thread processorThread;
     
-    public StreamManager(StreamUpdatable processor) {
+    /**
+     * Constructs an instance of <code>StreamManager</code> class
+     * 
+     * @param processor stream updateable to set
+     */
+    public StreamManager(StreamUpdateable processor) {
         this.processor = processor;
     }
     
@@ -39,6 +53,9 @@ public class StreamManager implements StreamProvider{
         return processor.getStreamSpec().getName();
     }
 
+    /**
+     * Starts the streaming by starting the processThread as long as it is stopped
+     */
     public synchronized void start() {
         if(!isRunning()){
             logger.info("starting streaming " + processor.getStreamSpec());
@@ -50,6 +67,9 @@ public class StreamManager implements StreamProvider{
         }
     }
 
+    /**
+     * Stops the streaming as long as it is running
+     */
     public synchronized void stop() {
         if(isRunning()){
             logger.info("stopping streaming " + processor.getStreamSpec());
@@ -79,7 +99,10 @@ public class StreamManager implements StreamProvider{
         return processorThread != null && processorThread.isAlive();
     }
     
-    public StreamUpdatable getProcessor() {
+    /**
+     * @return the stream updateable
+     */
+    public StreamUpdateable getProcessor() {
         return processor;
     }
 

@@ -8,7 +8,7 @@ import caja.gui.jtable.ActionModel;
 import caja.gui.utils.WaitDialog;
 import caja.jcastulo.media.entities.AudioMedia;
 import caja.jcastulo.stream.StreamListener;
-import caja.jcastulo.stream.StreamUpdatable;
+import caja.jcastulo.stream.StreamUpdateable;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
@@ -42,7 +42,7 @@ public class MediaQueuePanel extends javax.swing.JPanel implements StreamListene
     /**
      * The stream displayed and ready to be updated
      */
-    private StreamUpdatable streamUpdatable;
+    private StreamUpdateable streamUpdatable;
     
     /**
      * The chooser to choose audio files
@@ -154,7 +154,7 @@ public class MediaQueuePanel extends javax.swing.JPanel implements StreamListene
      * 
      * @param streamUpdatable - the streamUpdatable to set
      */
-    public void setStreamUpdatable(StreamUpdatable streamUpdatable) {
+    public void setStreamUpdatable(StreamUpdateable streamUpdatable) {
         if(this.streamUpdatable!=null){
             this.streamUpdatable.removeListener(this);
         }

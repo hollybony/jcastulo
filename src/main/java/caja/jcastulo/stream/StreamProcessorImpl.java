@@ -14,11 +14,11 @@ import org.slf4j.LoggerFactory;
 
 /**
  *
- * Default implementation of <code>StreamUpdatable</code>
+ * Default implementation of <code>StreamUpdateable</code>
  *
  * @author Carlos Juarez
  */
-public class StreamProcessorImpl implements StreamUpdatable {
+public class StreamProcessorImpl implements StreamUpdateable {
 
     /**
      * The logger

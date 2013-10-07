@@ -5,28 +5,38 @@ import java.util.LinkedList;
 import org.slf4j.LoggerFactory;
 
 /**
- * Thread safe
+ * Represents a number of <code>TimedFrame</code>s in a period of time
+ * 
+ * Thread safe to avoid <code>TimedFrame</code>s been accessed and modify at the same time
  *
  * @author bysse
- *
  */
 public class FrameStorage {
 
+    /**
+     * The logger
+     */
     final org.slf4j.Logger logger = LoggerFactory.getLogger(FrameStorage.class);
     
+    /**
+     * The timed frames
+     */
     private LinkedList<TimedFrame> timedFrames = new LinkedList<TimedFrame>();
     
-    public static final long LENGTH = 26; // MP3 frame length
+    /**
+     * This is MP3 frame length in milliseconds
+     */
+    public static final long LENGTH = 26; 
 
     /**
-     * Returns the frame that overlaps the given time. If the FrameStorage is
-     * empty {@link EmptyFrameStorageException} is be thrown. If no frame
+     * Looks for the frame that overlaps the given time. If the FrameStorage is
+     * empty {@link EmptyFrameStorageException} is thrown. If no frame
      * could be found for the specified time
      * {@link NoLoadedFrameException} or {@link OldFrameException}
      * is thrown.
      *
-     * @param time
-     * @return A TimedFrame that overlapped the given time.
+     * @param time - the time with which the <code>TimedFrame</code> is looked for
+     * @return a TimedFrame that overlapped the given time.
      */
     public synchronized TimedFrame find(final long time) {
         if (timedFrames.isEmpty()) {
@@ -47,20 +57,20 @@ public class FrameStorage {
     }
 
     /**
-     * Adds a frame to the FrameStorage. This method only adds the frame to the
+     * Adds a timed frame to the FrameStorage. This method only adds the frame to the
      * end of the storage. So adding out-of-order frames will cause error in
      * playback.
      *
-     * @param entry
+     * @param timedFrame - timedFrame to be added
      */
-    public synchronized void add(TimedFrame entry) {
-        timedFrames.add(entry);
+    public synchronized void add(TimedFrame timedFrame) {
+        timedFrames.add(timedFrame);
     }
 
     /**
-     * Removes all frames that do not overlap the given time.
+     * Removes all timed frames that are older than the given time.
      *
-     * @param time
+     * @param time - would be the older timed frame
      */
     public synchronized void purgeUntil(long time) {
         Iterator<TimedFrame> iterator = timedFrames.iterator();
@@ -74,10 +84,7 @@ public class FrameStorage {
     }
 
     /**
-     * Returns the end time of the last frame. If the storage is empty
-     * {@link EmptyFrameStorageException} will be thrown.
-     *
-     * @return End time of the last frame in storage.
+     * @return End time of the last frame in storage or null if the storage is empty.
      */
     public synchronized Long getLastFrameTime() {
         if (timedFrames.isEmpty()) {
@@ -95,14 +102,11 @@ public class FrameStorage {
     }
 
     /**
-     * Returns the start time of the first frame. If the storage is empty
-     * {@link EmptyFrameStorageException} will be thrown.
-     *
-     * @return Start time of first frame.
+     * @return start time of first frame or null if the storage is empty.
      */
-    private synchronized long getFirstFrameTime() {
+    public synchronized Long getFirstFrameTime() {
         if (timedFrames.isEmpty()) {
-            throw new EmptyFrameStorageException();
+            return null;
         }
         return timedFrames.getFirst().getStartTime();
     }

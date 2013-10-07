@@ -14,28 +14,43 @@ import java.util.Iterator;
 import java.util.List;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- *
+ * Default implementation of <code>StreamManagersService</code>
+ * 
  * @author Carlos Juarez
  */
 @Service("streamManagersService")
 public class StreamManagersServiceImpl implements StreamManagersService{
-    
+   
+    /**
+     * The logger
+     */
     final org.slf4j.Logger logger = LoggerFactory.getLogger(StreamManagersServiceImpl.class);
 
+    /**
+     * The streamSpecsService
+     */
     @Autowired
     private StreamSpecsService streamSpecsService;
     
+    /**
+     * The dataReader
+     */
     @Autowired
     private DataReader dataReader;
     
+    /**
+     * The dataReader
+     */
     @Autowired
     private FrameIteratorFactory mediaReaderFactory;
     
+    /**
+     * The streamManagers
+     */
     List<StreamManager> streamManagers;
     
     @Override
@@ -53,6 +68,12 @@ public class StreamManagersServiceImpl implements StreamManagersService{
         return streamManagers;
     }
     
+    /**
+     * Creates a new instance of <code>StreamManager</code> with the current dependencies and the stream spec given
+     * 
+     * @param streamSpec - the stream spec with which the stream manager is created
+     * @return the Stream manager created
+     */
     private StreamManager buildStreamManager(StreamSpec streamSpec) {
         return new StreamManager(new StreamProcessorImpl(streamSpec, dataReader, mediaReaderFactory));
     }
@@ -101,7 +122,7 @@ public class StreamManagersServiceImpl implements StreamManagersService{
     }
 
     @Override
-    public void persistStreamSpecs() {
+    public void flushStreamSpecs() {
         if(streamManagers!=null){
             for(StreamManager streamManager : streamManagers){
                 streamSpecsService.updateStreamSpec(streamManager.getProcessor().getStreamSpec());

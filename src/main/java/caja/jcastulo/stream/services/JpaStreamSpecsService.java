@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- *
+ * Implementation of <code>StreamSpecsService</code> that uses JPA as persistence technology
  * @author Carlos Juarez
  */
 @Service("streamSpecsService")
@@ -24,8 +24,14 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class JpaStreamSpecsService implements StreamSpecsService{
     
+    /**
+     * The logger
+     */
     final org.slf4j.Logger logger = LoggerFactory.getLogger(JpaStreamSpecsService.class);
 
+    /**
+     * The streamSpecRepository
+     */
     @Autowired
     private StreamSpecRepository streamSpecRepository;
     

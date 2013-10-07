@@ -6,11 +6,17 @@ import java.io.IOException;
 import org.slf4j.LoggerFactory;
 
 /**
- *
+ * <code>DataReader</code> implementation that reads an amount of bytes in advance this amount is measured
+ * in milliseconds
+ * 
+ * 
  * @author Carlos Juarez
  */
 class PreloadStreamDataReader implements DataReader {
 
+    /**
+     * The logger
+     */
     final org.slf4j.Logger logger = LoggerFactory.getLogger(PreloadStreamDataReader.class);
     
     /**

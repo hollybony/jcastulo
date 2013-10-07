@@ -127,7 +127,7 @@ public class StreamsPanel extends javax.swing.JPanel {
         for (StreamManager streamManager : streamManagers) {
             streamManager.stop();
         }
-        streamManagersService.persistStreamSpecs();
+        streamManagersService.flushStreamSpecs();
     }
 
     public JTable getStreamsTable() {
