@@ -111,13 +111,12 @@ public class ListenerClerk implements Runnable {
             //writes the suitable http message on out
             writeStartStreamResponse(streamProvider.getStreamName(), request, out);
             //stars reading the frames
-            TimedFrame timedFrame;
             long time = System.currentTimeMillis();
             int bytesSent = 0;
-            //stars reading entry by entry, every entry has a frame
+            //stars reading frame by frame, every entry has a frame
             while (true) {
                 try {
-                    timedFrame = streamProvider.findTimedFrame(time);
+                    TimedFrame timedFrame = streamProvider.findTimedFrame(time);
                     time = timedFrame.getStopTime();
                     // grab the next frame to send
                     Frame frame = timedFrame.getFrame();
