@@ -7,6 +7,7 @@ import java.nio.ByteBuffer;
 import org.slf4j.LoggerFactory;
 
 /**
+ * Used by sub packages of this module
  * 
  * @author Carlos Juarez
  */
