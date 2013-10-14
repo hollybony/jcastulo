@@ -5,7 +5,7 @@
 package caja.jcastulo.stream;
 
 /**
- * Provides information about a stream which could be running
+ * Represents a provider of stream that runs as a service or thread it depends of the implementation
  * 
  * @author Carlos Juarez
  */
@@ -30,7 +30,9 @@ public interface StreamProvider {
      * Finds a timed frame by milliseconds
      * 
      * @param time - the milliseconds 
-     * @return the found timed frame or null it was not found
+     * @return the found timed frame
+     * 
+     * @throws EmptyFrameStorageException
      */
     public TimedFrame findTimedFrame(long time);
     
