@@ -6,12 +6,17 @@
 		http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-3.1.xsd">
     
 
-    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
+<!--    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
               destroy-method="close">
         <property name="driverClass" value="com.mysql.jdbc.Driver" />
         <property name="jdbcUrl" value="jdbc:mysql://localhost:3306/jcastulodb?autoReconnect=true&amp;zeroDateTimeBehavior=convertToNull" />
         <property name="user" value="jcastulo" />
         <property name="password" value="jcastulo" />
-    </bean>
+    </bean>-->
+    
+    <jdbc:embedded-database id="dataSource" type="H2">
+        <jdbc:script location="classpath:sql/schema-h2.sql"/>
+        <jdbc:script location="classpath:sql/initial-data.sql"/>
+    </jdbc:embedded-database>
 
 </beans>
