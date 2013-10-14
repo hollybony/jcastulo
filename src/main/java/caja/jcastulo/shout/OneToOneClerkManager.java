@@ -89,14 +89,14 @@ public class OneToOneClerkManager implements ListenerClerkManager {
      */
     @Override
     public void attendListener(Socket clientSocket) {
-        ListenerClerk shoutRunnable;
+        ListenerClerk clerk;
         try {
-            shoutRunnable = new ListenerClerk(streamProviderResolver, clientSocket, doneCallback);
-            FutureTask<?> futureTask = new FutureTask<Object>(shoutRunnable, null);
-            taskHolders.add(new TaskHolder(futureTask, shoutRunnable.getClientSpec()));
+            clerk = new ListenerClerk(streamProviderResolver, clientSocket, doneCallback);
+            FutureTask<?> futureTask = new FutureTask<Object>(clerk, null);
+            taskHolders.add(new TaskHolder(futureTask, clerk.getClientSpec()));
             executorService.execute(futureTask);
             for(ListenerUpdatesListener listener : listeners){
-                listener.listenerHasArrived(shoutRunnable.getClientSpec());
+                listener.listenerHasArrived(clerk.getClientSpec());
             }
         } catch (IOException ex) {
             if (!clientSocket.isClosed()) {
@@ -106,6 +106,9 @@ public class OneToOneClerkManager implements ListenerClerkManager {
                 }
             }
         } catch (IllegalRequestException ex) {
+            
+        }finally{
+            clerk = null;
         }
     }
 
