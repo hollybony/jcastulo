@@ -16,7 +16,10 @@
     
     <bean id="mediaReaderFactory" class="caja.jcastulo.media.FrameIteratorFactory">
         <constructor-arg>
-            <bean class="caja.jcastulo.media.audio.Mp3FrameIterator"/>
+            <list>
+                <bean class="caja.jcastulo.media.audio.BasicMp3Iterator"/>
+                <bean class="caja.jcastulo.media.audio.RencoderMp3Iterator"/>
+            </list>
         </constructor-arg>
     </bean>
     
