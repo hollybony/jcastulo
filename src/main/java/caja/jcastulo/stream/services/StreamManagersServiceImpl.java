@@ -5,7 +5,7 @@
 package caja.jcastulo.stream.services;
 
 import caja.jcastulo.media.FrameIteratorFactory;
-import caja.jcastulo.stream.DataReader;
+import caja.jcastulo.stream.FrameStorageUpdater;
 import caja.jcastulo.stream.StreamManager;
 import caja.jcastulo.stream.StreamProcessorImpl;
 import caja.jcastulo.stream.entities.StreamSpec;
@@ -40,7 +40,7 @@ public class StreamManagersServiceImpl implements StreamManagersService{
      * The dataReader
      */
     @Autowired
-    private DataReader dataReader;
+    private FrameStorageUpdater storageUpdater;
     
     /**
      * The dataReader
@@ -75,7 +75,7 @@ public class StreamManagersServiceImpl implements StreamManagersService{
      * @return the Stream manager created
      */
     private StreamManager buildStreamManager(StreamSpec streamSpec) {
-        return new StreamManager(new StreamProcessorImpl(streamSpec, dataReader, mediaReaderFactory));
+        return new StreamManager(new StreamProcessorImpl(streamSpec, storageUpdater, mediaReaderFactory));
     }
 
     @Override

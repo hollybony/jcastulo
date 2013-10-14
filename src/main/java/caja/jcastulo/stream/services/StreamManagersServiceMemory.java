@@ -5,7 +5,7 @@
 package caja.jcastulo.stream.services;
 
 import caja.jcastulo.media.FrameIteratorFactory;
-import caja.jcastulo.stream.DataReader;
+import caja.jcastulo.stream.FrameStorageUpdater;
 import caja.jcastulo.stream.StreamManager;
 import caja.jcastulo.stream.StreamProcessorImpl;
 import caja.jcastulo.stream.entities.StreamSpec;
@@ -23,9 +23,9 @@ public class StreamManagersServiceMemory implements StreamManagersService{
     
     private FrameIteratorFactory mediaReaderFactory;
     
-    private DataReader dataReader;
+    private FrameStorageUpdater dataReader;
     
-    public StreamManagersServiceMemory(List<StreamSpec> streamSpecs, DataReader dataReader, FrameIteratorFactory mediaReaderFactory){
+    public StreamManagersServiceMemory(List<StreamSpec> streamSpecs, FrameStorageUpdater dataReader, FrameIteratorFactory mediaReaderFactory){
         streamManagers = new ArrayList<StreamManager>();
         this.mediaReaderFactory = mediaReaderFactory;
         this.dataReader = dataReader;
