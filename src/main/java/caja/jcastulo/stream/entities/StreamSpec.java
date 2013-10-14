@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
@@ -27,11 +28,13 @@ public class StreamSpec {
      * The name of the stream
      */
     @Id
+    @Column(length=32)
     private String name;
     
     /**
      * The mount point of the stream. It is used by the clients to connect with this
      */
+    @Column(length=32, nullable=false)
     private String mountPoint;
     
     /**
