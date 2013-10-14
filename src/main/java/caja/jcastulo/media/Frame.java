@@ -1,7 +1,7 @@
 package caja.jcastulo.media;
 
 /**
- * MP3 streams are arranged into "frames", each with a header that provides basic information about
+ * At least Mp3 streams are arranged into "frames", each with a header that provides basic information about
  * encoding type, bitrate, sampling frequency, etc.
  * 
  * 
