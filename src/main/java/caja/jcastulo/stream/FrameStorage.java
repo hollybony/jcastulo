@@ -53,7 +53,7 @@ public class FrameStorage {
             throw new OldFrameException();
         }
         int index = (int) ((time - firstFrameTime) / LENGTH);
-        return timedFrames.get(index);
+        return index<timedFrames.size()?timedFrames.get(index):timedFrames.getLast();
     }
 
     /**
@@ -84,7 +84,7 @@ public class FrameStorage {
     }
 
     /**
-     * @return End time of the last frame in storage or null if the storage is empty.
+     * @return End time of the latest frame in storage or null if the storage is empty.
      */
     public synchronized Long getLastFrameTime() {
         if (timedFrames.isEmpty()) {
