@@ -6,6 +6,7 @@ package caja.jcastulo.media.entities;
 
 import caja.jcastulo.media.audio.SongMetadata;
 import caja.jcastulo.media.audio.SongMetadataFactory;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
@@ -50,6 +51,7 @@ public class AudioMedia{
      * @return the pathname
      */
     @Id
+    @Column(length=255)
     public String getPathname() {
         return pathname;
     }
