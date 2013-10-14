@@ -9,12 +9,17 @@ import caja.jcastulo.media.entities.AudioMedia;
 import caja.jcastulo.stream.entities.StreamSpec;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.slf4j.LoggerFactory;
 
 /**
- *
- * Default implementation of <code>StreamUpdateable</code>
+ * Default implementation of <code>StreamUpdateable</code> as it is <code>Runnable</code> class the main method
+ * is run() it means that when this thread is running, the audio medias contained in the streamSpec streamSpec.getAudioMedias() 
+ * are managed as a queue in such a way that the first audio media audioMedias.get(0) in that list is going to be streamed
+ * by updating the frameStorage and the metadataManager frame by frame then the audio media is going to be removed from
+ * the queue and the following audio media is the next to be streamed repeating the same process until the queue got empty
  *
  * @author Carlos Juarez
  */
@@ -53,7 +58,7 @@ public class StreamProcessorImpl implements StreamUpdateable {
     /**
      * The dataReader
      */
-    private final DataReader dataReader;
+    private final FrameStorageUpdater dataReader;
     
     /**
      * The metadataManager
@@ -87,7 +92,7 @@ public class StreamProcessorImpl implements StreamUpdateable {
      * @param streamSpec - the streamSpec to set
      * @param dataReader - the dataReader to set
      */
-    public StreamProcessorImpl(StreamSpec streamSpec, DataReader dataReader) {
+    public StreamProcessorImpl(StreamSpec streamSpec, FrameStorageUpdater dataReader) {
         this(streamSpec, dataReader, new FrameIteratorFactory());
     }
 
@@ -98,7 +103,7 @@ public class StreamProcessorImpl implements StreamUpdateable {
      * @param dataReader - the dataReader to set
      * @param mediaReaderFactory - the mediaReaderFactory to set
      */
-    public StreamProcessorImpl(StreamSpec streamSpec, DataReader dataReader, FrameIteratorFactory mediaReaderFactory) {
+    public StreamProcessorImpl(StreamSpec streamSpec, FrameStorageUpdater dataReader, FrameIteratorFactory mediaReaderFactory) {
         this.streamSpec = streamSpec;
         metadataManager = new MetadataManager();
         streamListeners = new ArrayList<StreamListener>();
@@ -107,7 +112,8 @@ public class StreamProcessorImpl implements StreamUpdateable {
     }
 
     /**
-     * Runs the stream procesor until an interruption or error
+     * Runs the stream processor until an interruption or error. Basically iterates over frames and if necessary
+     * change the current and medias as well as its frame iterator
      */
     @Override
     public void run() {
@@ -118,7 +124,7 @@ public class StreamProcessorImpl implements StreamUpdateable {
         while (true) {
             try {
                 synchronized (this) {
-                    updateMediaReader();
+                    checkForStatusChanges();
                 }
             } catch (Exception ex) {
                 logger.error(Thread.currentThread().getName() + " exception while updating media reader", ex);
@@ -160,13 +166,13 @@ public class StreamProcessorImpl implements StreamUpdateable {
     }
 
     /**
-     * Makes sure that there is a valid {@link FrameIterator} instantiated as long
-     * as there are more entries in the queue. If the first media of the queue
-     * is being reading a new reader is created and open If the current reader
-     * has reached the eof and there are remaining medias, reader for the next
-     * media is created and open
+     * Makes sure there is a valid {@link FrameIterator} instantiated as long
+     * as there are more medias in the queue. If the first media of the queue
+     * is what is being reading then a new frame iterator is created and open If the
+     * current frame iterator has reached the eof and there are remaining medias,
+     * frame iterator for the next media is created and open
      */
-    private void updateMediaReader() {
+    private void checkForStatusChanges() {
         if (status.equals(Status.CURRENT_MEDIA_CHANGE_REQUESTED)) {
             logger.info("skipping current media " + currentMetadata());
             if (frameIterator != null) {
@@ -191,7 +197,7 @@ public class StreamProcessorImpl implements StreamUpdateable {
                 } catch (IOException ex) {
                     processCurrentMediaError(ex);
                 }
-            }else if (frameIterator != null && frameIterator.hasNext()) {
+            }else if (frameIterator != null && !frameIterator.hasNext()) {
                 consumeMedia(0);
                 try{
                     frameIterator.close();
@@ -232,14 +238,16 @@ public class StreamProcessorImpl implements StreamUpdateable {
     }
     
     /**
-     * Updates frame iterator with the one for the media at the top of the queue and update the metadatas
+     * Updates frame iterator with the one for the media at the top of the queue as well as the metadata
      * 
      * @throws IOException 
      */
     private void playMedia() throws IOException{
         synchronized (streamSpec.getAudioMedias()) {
-            frameIterator = frameIteratorFactory.getFrameIterator(streamSpec.getAudioMedias().get(0));
-            frameIterator.open(streamSpec.getAudioMedias().get(0));
+            Map<String,Object> properties = new HashMap<String, Object>();
+            properties.put("bitrate", 64000);
+            frameIterator = frameIteratorFactory.getIterator(streamSpec.getAudioMedias().get(0), properties);
+            frameIterator.open(streamSpec.getAudioMedias().get(0), properties);
             updateCurrentMedia(streamSpec.getAudioMedias().get(0));
         }
         logger.info("now playing " + currentMetadata());
