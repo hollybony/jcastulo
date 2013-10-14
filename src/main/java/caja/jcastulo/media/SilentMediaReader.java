@@ -2,6 +2,7 @@ package caja.jcastulo.media;
 
 import caja.jcastulo.media.entities.AudioMedia;
 import java.io.IOException;
+import java.util.Map;
 
 /**
  * It provides an mp3 silent frame
@@ -55,7 +56,7 @@ public class SilentMediaReader implements FrameIterator {
     }
 
     @Override
-    public void open(AudioMedia media) throws IOException {
+    public void open(AudioMedia media, Map<String, Object> properties) throws IOException {
     }
 
     @Override
@@ -67,7 +68,7 @@ public class SilentMediaReader implements FrameIterator {
      * This method always returns false so the reader isn't used by mistake.
      */
     @Override
-    public boolean supports(AudioMedia media) {
+    public boolean supports(AudioMedia media, Map<String, Object> properties) {
         return false;
     }
 
