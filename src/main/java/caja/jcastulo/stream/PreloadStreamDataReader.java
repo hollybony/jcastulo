@@ -6,13 +6,13 @@ import java.io.IOException;
 import org.slf4j.LoggerFactory;
 
 /**
- * <code>DataReader</code> implementation that reads an amount of bytes in advance this amount is measured
+ * <code>FrameStorageUpdater</code> implementation that reads an amount of bytes in advance this amount is measured
  * in milliseconds
  * 
  * 
  * @author Carlos Juarez
  */
-class PreloadStreamDataReader implements DataReader {
+class PreloadStreamDataReader implements FrameStorageUpdater {
 
     /**
      * The logger
@@ -49,7 +49,7 @@ class PreloadStreamDataReader implements DataReader {
         if (lastFrameTime > currentTime + MAXIMUM_PRELOAD) {
             // the maximum data preload have been reached, stall the thread for a while
             //Wow!! this computer is really fast
-                Thread.sleep(250);
+            Thread.sleep(250);
             return;
         }
         //.. read more data from the media
