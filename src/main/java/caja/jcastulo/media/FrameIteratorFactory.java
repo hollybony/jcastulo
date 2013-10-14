@@ -3,9 +3,10 @@ package caja.jcastulo.media;
 import caja.jcastulo.media.entities.AudioMedia;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
- * Factory class that provides the suitable <code>FrameIterator</code> for reading a given media
+ * Factory class that resolves the suitable <code>FrameIterator</code> for a given media
  * 
  * @author Carlos Juarez
  */
@@ -28,14 +29,12 @@ public class FrameIteratorFactory {
      * 
      * @param oneFrameIterator - one frameIterator to add
      */
-    public FrameIteratorFactory(FrameIterator oneFrameIterator){
-        if(oneFrameIterator!=null){
-            addFrameIterator(oneFrameIterator);
-        }
+    public FrameIteratorFactory(List<FrameIterator> frameIterators){
+        this.frameIterators = frameIterators;
     }
 
     /**
-     * Add a frameIterator to the available frameIterator list
+     * Adds a frameIterator to the available frameIterator list
      * 
      * @param frameIterator - frameIterator to add
      */
@@ -44,17 +43,19 @@ public class FrameIteratorFactory {
     }
 
     /**
-     * Finds and creates a compatible <code>FrameIterator</code>  that can handle the given media file.
-     *
-     * @throws NotSupportedFrameIteratorException if frameIterator is not found
+     * Finds and creates a compatible <code>FrameIterator</code> that can handle the given audio media.
+     * 
+     * @throws NotSupportedFrameIteratorException if suitable frameIterator is not found
      * @param media - the media for which frameIterator is found
+     * @param bitrate - the desire bitrate with which the media is going to be read. To read the audio
+     * media with the original bitrate just set this parameter as 0
      * @return FrameIterator found
      */
-    public FrameIterator getFrameIterator(AudioMedia media) {
-        for (FrameIterator reader : frameIterators) {
-            if (reader.supports(media)) {
+    public FrameIterator getIterator(AudioMedia media, Map<String,Object> properties) {
+        for (FrameIterator iterator : frameIterators) {
+            if (iterator.supports(media, properties)) {
                 try {
-                    return (FrameIterator) reader.getClass().newInstance();
+                    return (FrameIterator) iterator.getClass().newInstance();
                 } catch (InstantiationException ex) {
                     throw new NotSupportedFrameIteratorException(ex);
                 } catch (IllegalAccessException ex) {
