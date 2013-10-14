@@ -1,11 +1,11 @@
 package caja.jcastulo.media.mp3;
 
+import caja.jcastulo.media.Frame;
+import caja.jcastulo.media.audio.BasicMp3Iterator;
+import caja.jcastulo.media.entities.AudioMedia;
 import java.io.File;
 import java.io.IOException;
 import junit.framework.TestCase;
-import caja.jcastulo.media.Frame;
-import caja.jcastulo.media.entities.AudioMedia;
-import caja.jcastulo.media.audio.Mp3FrameIterator;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -15,7 +15,7 @@ public class Mp3MediaReaderTest extends TestCase {
     
     private AudioMedia media = null;
     
-    private Mp3FrameIterator reader = null;
+    private BasicMp3Iterator frameIterator = null;
 
     @Before
     @Override
@@ -23,17 +23,17 @@ public class Mp3MediaReaderTest extends TestCase {
         media = new AudioMedia();
         media.setPathname(new File(base, "test.mp3").getPath());
 
-        reader = new Mp3FrameIterator();
+        frameIterator = new BasicMp3Iterator();
     }
 
     @Test
     public void testRead() {
         try {
-            reader.open(media);
+            frameIterator.open(media, null);
             Frame frame;
 
-            frame = reader.next();
-            frame = reader.next();
+            frame = frameIterator.next();
+            frame = frameIterator.next();
         } catch (IOException e) {
             e.printStackTrace();
             fail();
