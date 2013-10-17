@@ -18,7 +18,8 @@
         <constructor-arg>
             <list>
                 <bean class="caja.jcastulo.media.audio.BasicMp3Iterator"/>
-                <bean class="caja.jcastulo.media.audio.RencoderMp3Iterator"/>
+                <!--<bean class="caja.jcastulo.media.audio.RencoderMp3Iterator"/>-->
+                <bean class="caja.jcastulo.media.audio.DirectRencoderMp3Iterator"/>
             </list>
         </constructor-arg>
     </bean>
