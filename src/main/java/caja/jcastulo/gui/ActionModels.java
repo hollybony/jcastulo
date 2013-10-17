@@ -5,21 +5,19 @@
 package caja.jcastulo.gui;
 
 import caja.gui.jtable.ActionModel;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
-import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import org.slf4j.LoggerFactory;
 
 /**
  * Contains an action model for every icon in this package
- * 
+ *
  * @author Carlos Juarez
  */
 public class ActionModels {
-    
+
     /**
      * The logger
      */
@@ -38,35 +36,31 @@ public class ActionModels {
 
     private ActionModels() {
         ImageSpec[] imageSpecs = new ImageSpec[]{
-          new ImageSpec("music.png", "View"),
-          new ImageSpec("start.png", "Start"),
-          new ImageSpec("stop.png", "Stop"),
-          new ImageSpec("headset.png", "View"),
-          new ImageSpec("remove.png", "Remove")
+            new ImageSpec("images/music.png", "View"),
+            new ImageSpec("images/start.png", "Start"),
+            new ImageSpec("images/stop.png", "Stop"),
+            new ImageSpec("images/headset.png", "View"),
+            new ImageSpec("images/remove.png", "Remove")
         };
-        for(ImageSpec imageSpec : imageSpecs){
+        for (ImageSpec imageSpec : imageSpecs) {
             actionModels.put(imageSpec.icon, createActionModel(imageSpec.icon, imageSpec.label));
         }
     }
-    
-    public ActionModel getActionModel(String icon){
+
+    public ActionModel getActionModel(String icon) {
         return actionModels.get(icon);
     }
-    
+
     private ActionModel createActionModel(String strImage, String label) {
-        ActionModel actionModel = null;
-        try {
-            BufferedImage image;
-            image = ImageIO.read(getClass().getResourceAsStream(strImage));
-            ImageIcon icon = new ImageIcon(image);
-            actionModel = new ActionModel(icon, label);
-        } catch (IOException ex) {
-            logger.error("Error while creating image", ex);
-        }
+        ActionModel actionModel;
+        URL url = Thread.currentThread().getContextClassLoader().getResource(strImage);
+        ImageIcon icon = new ImageIcon(url);
+        actionModel = new ActionModel(icon, label);
         return actionModel;
     }
-    
-    class ImageSpec{
+
+    class ImageSpec {
+
         String icon;
         String label;
 
@@ -75,5 +69,4 @@ public class ActionModels {
             this.label = label;
         }
     }
-   
 }
