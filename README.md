@@ -1,9 +1,29 @@
 jcastulo
 ========
 
-Shoutcast server implemented with Java
+jcastulo is a Shoutcast server implemented with Java
 
+Features
+- Allows to create several mount point which are names streams
+- Allows to add mp3 files to every stream
+- Re-encoding the mp3 files before they are send to the clients (reduce the bitrate)
+- Tested with Winamp as Shoutcast client
 
-Next fixes/improvements
-- Option of using a file/in memory database
-- Enable streaming to browser clients
+Frameworks used
+- Spring Framework 3.2.3
+- Hibernate 4.2.0
+- JPA 2.0
+- JAudio tagger 2.0.3
+- Xuggler 5.3
+
+Coming fixes/changes
+- Option of canceling media audio load
+- Opening message when GUI starting
+- Verify jcastulo already opened to avoid opening more than one instance
+- Configuration properties file that includes
+  * Port
+  * Domain (if not specified then use IP address)
+  * Log location (if not specified then use the same dir)
+  * datasource info (if not specified then use H2) option for javaDB files should be in the same dir
+- Test what happens if port is deny to be opened
+- Change remove columns to context menu option
