@@ -50,7 +50,7 @@
               <EmptySpace min="-2" max="-2" attributes="0"/>
               <Component id="addButton" min="-2" max="-2" attributes="0"/>
               <EmptySpace min="-2" max="-2" attributes="0"/>
-              <Component id="jScrollPane1" pref="123" max="32767" attributes="0"/>
+              <Component id="jScrollPane1" pref="107" max="32767" attributes="0"/>
               <EmptySpace min="-2" max="-2" attributes="0"/>
           </Group>
       </Group>
@@ -126,7 +126,7 @@
     <Component class="javax.swing.JButton" name="addButton">
       <Properties>
         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-          <Image iconType="3" name="/caja/jcastulo/gui/add.png"/>
+          <Image iconType="3" name="/images/add.png"/>
         </Property>
         <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
           <Dimension value="[50, 25]"/>

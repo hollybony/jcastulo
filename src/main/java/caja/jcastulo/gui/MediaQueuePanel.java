@@ -172,7 +172,7 @@ public class MediaQueuePanel extends javax.swing.JPanel implements StreamListene
         model.setRowCount(0);
         int i = 0;
         for (AudioMedia media : streamUpdatable.getStreamSpec().getAudioMedias()) {
-            ActionModel removeModel = ActionModels.getInstance().getActionModel("remove.png").copy();
+            ActionModel removeModel = ActionModels.getInstance().getActionModel("images/remove.png").copy();
             removeModel.setPayload(i);
             model.addRow(new Object[]{++i, media.toString(),removeModel});
         }
@@ -259,7 +259,7 @@ public class MediaQueuePanel extends javax.swing.JPanel implements StreamListene
         jTable.getColumnModel().getColumn(2).setCellEditor(new caja.gui.jtable.ButtonEditor(removeListener));
         jTable.getColumnModel().getColumn(2).setCellRenderer(new caja.gui.jtable.ButtonRenderer());
 
-        addButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/caja/jcastulo/gui/add.png"))); // NOI18N
+        addButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/add.png"))); // NOI18N
         addButton.setMaximumSize(new java.awt.Dimension(50, 25));
         addButton.setMinimumSize(new java.awt.Dimension(50, 25));
         addButton.addActionListener(new java.awt.event.ActionListener() {
@@ -293,7 +293,7 @@ public class MediaQueuePanel extends javax.swing.JPanel implements StreamListene
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(addButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 123, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 107, Short.MAX_VALUE)
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
