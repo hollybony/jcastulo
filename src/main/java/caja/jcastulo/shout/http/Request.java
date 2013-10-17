@@ -12,9 +12,15 @@ import java.util.regex.Pattern;
 public class Request {
 
     /**
-     * Regex to find the mount point in the request
+     * Regular expression to find the mount point in the request
      */
-    private static final Pattern getRegexp = Pattern.compile("get\\s+([^\\s]+).*", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+    private static final Pattern getRegexp = Pattern.compile("GET\\s+([^\\s]+).*", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+    
+    private static final Pattern agentRegexp = Pattern.compile("User-Agent:\\s*([\\S]+).*", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+    
+    private static final Pattern icyMetadataRegexp = Pattern.compile("Icy-MetaData:\\s*(1).*", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+    
+    
 
     /**
      * Types of requests
@@ -37,6 +43,10 @@ public class Request {
      * Type of request
      */
     private Type type;
+    
+    private String userAgent;
+    
+    private boolean metadataRequested;
 
     /**
      * Constructs an instance of <code>Request</code> class
@@ -55,12 +65,33 @@ public class Request {
      * @throws IllegalRequestException 
      */
     private void processRequest() throws IllegalRequestException {
-        Matcher matcher = getRegexp.matcher(rawRequest);
-        if (matcher.matches()) {
-            path = matcher.group(1);
-            type = Type.HTTP;
-        }else{
-            throw new IllegalRequestException("Illegal request [" + rawRequest + "]");
+        String[]lines = rawRequest.split("\\r?\\n");
+        Matcher matcher;
+        type = Type.HTTP;
+        for(String line: lines){
+            line = line.trim();
+            if(line.startsWith("GET")){
+                matcher = getRegexp.matcher(line);
+                if (matcher.matches()) {
+                    path = matcher.group(1);
+                }
+            }else if(line.startsWith("User-Agent:")){
+                matcher = agentRegexp.matcher(line);
+                if (matcher.matches()) {
+                    userAgent = matcher.group(1);
+                }
+            }else if(line.startsWith("Icy-MetaData:")){
+                matcher = icyMetadataRegexp.matcher(line);
+                if(matcher.matches()){
+                    metadataRequested = true;
+                }
+            }
+        }
+        if(path==null){
+            throw new IllegalRequestException("Illegal request path was not found [" + rawRequest + "]");
+        }
+        if(userAgent==null){
+            throw new IllegalRequestException("Illegal request user agent was not found [" + rawRequest + "]");
         }
     }
 
@@ -85,8 +116,27 @@ public class Request {
         return type;
     }
 
+    /**
+     * @return user agent
+     */
+    public String getUserAgent(){
+        return userAgent;
+    }
+    
+    public boolean isBrowserUserAgent(){
+        if(userAgent.contains("Mozilla/5.0")){
+            return true;
+        }
+        return false;
+    }
+    public boolean isMetadataRequested(){
+        return metadataRequested;
+    }
+    
     @Override
     public String toString() {
-        return rawRequest;
+        return "Request{" + "path=" + path + ", type=" + type + ", browserUserAgent=" + isBrowserUserAgent() +
+                ", metadataRequested=" + metadataRequested + ", userAgent=" + userAgent + '}';
     }
+    
 }
