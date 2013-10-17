@@ -29,10 +29,13 @@ public class PacketFrameCatcher extends MediaListenerAdapter {
 
     @Override
     public void onWritePacket(IWritePacketEvent event) {
+        writePacket(event.getPacket());
+    }
+    
+    public void writePacket(IPacket packet) {
         newFrame = true;
         currentFrame = null;
         currentFrame = new Frame();
-        IPacket packet = event.getPacket();
         byte[] bytes = new byte[packet.getSize()];
         packet.get(0, bytes, 0, packet.getSize());
         currentHeader.setData(bytes[0], bytes[1], bytes[2], bytes[3]);
