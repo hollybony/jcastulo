@@ -105,7 +105,7 @@ public class ListenerClerk implements Runnable {
      */
     @Override
     public void run() {
-        logger.info("client " + clientSpec.ipPlusPort() + " has started");
+        logger.info("client " + clientSpec.ipPlusPort() + " has started with request : " + request);
         try {
             OutputStream out = socket.getOutputStream();
             //writes the suitable http message on out
@@ -123,7 +123,7 @@ public class ListenerClerk implements Runnable {
 //                    logger.debug("processing frame : " + frame + " time :" + dateFormat.format(new Date(time)) );
                     // Check if we have to send metadata
                     //send possible the first part of the frame then metadata then the rest of the frame
-                    if (bytesSent + frame.getSize() >= METADATA_INTERVAL) {
+                    if (request.isMetadataRequested() && (bytesSent + frame.getSize() >= METADATA_INTERVAL)) {
                         int sendBefore = METADATA_INTERVAL - bytesSent;
                         if (sendBefore > 0) {
                             out.write(frame.getData(), 0, sendBefore);
@@ -215,7 +215,11 @@ public class ListenerClerk implements Runnable {
      */
     protected void writeStartStreamResponse(String name, Request request, OutputStream out) throws IOException {
         StringBuilder response = new StringBuilder();
-        response.append("ICY 200 OK\r\n");
+        if(request.isBrowserUserAgent()){
+            response.append("HTTP/1.1 200 OK\r\nContent-Type: audio/mpeg\r\n");
+        }else{
+            response.append("ICY 200 OK\r\n");
+        }
         // add the stream name
         response.append("icy-notice1:<BR>This stream requires <a href=\"http://www.winamp.com/\">Winamp</a><BR>\r\n");
         response.append("icy-notice2:SHOUTcast Distributed Network Audio Server/win32 v1.8.2<BR>\r\n");
@@ -225,7 +229,9 @@ public class ListenerClerk implements Runnable {
         response.append("content-type:audio/mpeg\r\n");
         // add metadata information
         response.append("icy-pub:1\r\n");
-        response.append("icy-metaint:").append(METADATA_INTERVAL).append("\r\n");
+        if(request.isMetadataRequested()){
+            response.append("icy-metaint:").append(METADATA_INTERVAL).append("\r\n");
+        }
         response.append("icy-br:128\r\n");
         response.append("\r\n");
         out.write(response.toString().getBytes());
