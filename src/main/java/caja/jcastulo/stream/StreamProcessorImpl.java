@@ -253,7 +253,7 @@ public class StreamProcessorImpl implements StreamUpdateable {
             frameIterator.open(streamSpec.getAudioMedias().get(0), properties);
             updateCurrentMedia(streamSpec.getAudioMedias().get(0));
         }
-        logger.info("now playing " + currentMetadata() + "with properties " + properties);
+        logger.info("now playing " + currentMetadata() + " with properties " + properties);
         status = Status.PLAYING;
         for (StreamListener listener : streamListeners) {
             listener.mediaChanged();
