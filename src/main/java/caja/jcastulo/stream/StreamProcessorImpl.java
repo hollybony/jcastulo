@@ -243,14 +243,17 @@ public class StreamProcessorImpl implements StreamUpdateable {
      * @throws IOException 
      */
     private void playMedia() throws IOException{
+        Map<String,Object> properties = new HashMap<String, Object>();
+        String bitrate = System.getProperty("bitrate");
+        if(bitrate!=null){
+            properties.put("bitrate", Integer.parseInt(System.getProperty("bitrate")));
+        }
         synchronized (streamSpec.getAudioMedias()) {
-            Map<String,Object> properties = new HashMap<String, Object>();
-            properties.put("bitrate", 64000);
             frameIterator = frameIteratorFactory.getIterator(streamSpec.getAudioMedias().get(0), properties);
             frameIterator.open(streamSpec.getAudioMedias().get(0), properties);
             updateCurrentMedia(streamSpec.getAudioMedias().get(0));
         }
-        logger.info("now playing " + currentMetadata());
+        logger.info("now playing " + currentMetadata() + "with properties " + properties);
         status = Status.PLAYING;
         for (StreamListener listener : streamListeners) {
             listener.mediaChanged();
