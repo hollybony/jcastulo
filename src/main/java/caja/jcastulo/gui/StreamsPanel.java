@@ -111,12 +111,12 @@ public class StreamsPanel extends javax.swing.JPanel {
         for (StreamManager streamManager : streamManagers) {
             ActionModel actionModel;
             if (streamManager.isRunning()) {
-                actionModel = ActionModels.getInstance().getActionModel("stop.png").copy();
+                actionModel = ActionModels.getInstance().getActionModel("images/stop.png").copy();
             } else {
-                actionModel = ActionModels.getInstance().getActionModel("start.png").copy();
+                actionModel = ActionModels.getInstance().getActionModel("images/start.png").copy();
             }
             actionModel.setPayload(streamManager.getStreamName());
-            ActionModel removeModel = ActionModels.getInstance().getActionModel("remove.png").copy();
+            ActionModel removeModel = ActionModels.getInstance().getActionModel("images/remove.png").copy();
             removeModel.setPayload(streamManager.getStreamName());
             model.addRow(new Object[]{streamManager.getStreamName(), streamManager.getMountPoint(), actionModel, removeModel});
         }
@@ -190,7 +190,7 @@ public class StreamsPanel extends javax.swing.JPanel {
         streamsTable.getColumnModel().getColumn(3).setCellEditor(new caja.gui.jtable.ButtonEditor(removeListener));
         streamsTable.getColumnModel().getColumn(3).setCellRenderer(new caja.gui.jtable.ButtonRenderer());
 
-        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/caja/jcastulo/gui/add.png"))); // NOI18N
+        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/add.png"))); // NOI18N
         jButton1.setMaximumSize(new java.awt.Dimension(50, 25));
         jButton1.setMinimumSize(new java.awt.Dimension(50, 25));
         jButton1.addActionListener(new java.awt.event.ActionListener() {
@@ -217,7 +217,7 @@ public class StreamsPanel extends javax.swing.JPanel {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 231, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 215, Short.MAX_VALUE)
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
