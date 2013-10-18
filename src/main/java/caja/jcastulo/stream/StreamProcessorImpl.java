@@ -350,6 +350,32 @@ public class StreamProcessorImpl implements StreamUpdateable {
     }
     
     /**
+     * 
+     */
+    @Override
+    public void emptyMediaQueue(){
+        synchronized (this) {
+            if(status.equals(Status.STOPPED)){
+                synchronized (streamSpec.getAudioMedias()) {
+                    streamSpec.getAudioMedias().clear();
+                }
+                for (StreamListener streamListener : streamListeners) {
+                        streamListener.queueChanged();
+                }
+            }else if (status.equals(Status.PLAYING)){
+                synchronized (streamSpec.getAudioMedias()) {
+                    if(streamSpec.getAudioMedias().size()>1){
+                        for(int i=1;i<streamSpec.getAudioMedias().size();i++){
+                            streamSpec.getAudioMedias().remove(i);
+                        }
+                    }
+                }
+                status = Status.CURRENT_MEDIA_CHANGE_REQUESTED;
+            }
+        }
+    }
+    
+    /**
      * Moves a media from one place to another in the queue and notifies listeners
      * 
      * @param sourceIndex - index where the media is taken

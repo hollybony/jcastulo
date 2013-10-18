@@ -27,6 +27,11 @@ public interface StreamUpdateable extends StreamProcessor{
     public void removeMedia(int index);
     
     /**
+     * Empties all the media files in the queue
+     */
+    public void emptyMediaQueue();
+    
+    /**
      * Moves a media from one place to another
      * 
      * @param sourceIndex - index where the media is going to be removed
