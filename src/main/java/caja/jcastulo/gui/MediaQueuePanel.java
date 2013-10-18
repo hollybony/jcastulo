@@ -14,6 +14,8 @@ import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
@@ -147,6 +149,7 @@ public class MediaQueuePanel extends javax.swing.JPanel implements StreamListene
         jTable.setRowHeight(26);
         jTable.setTransferHandler(transferHandler);
         addButton.setEnabled(false);
+        removeButton.setEnabled(false);
     }
     
     /**
@@ -176,6 +179,11 @@ public class MediaQueuePanel extends javax.swing.JPanel implements StreamListene
             removeModel.setPayload(i);
             model.addRow(new Object[]{++i, media.toString(),removeModel});
         }
+        if(jTable.getRowCount()>0){
+            removeButton.setEnabled(true);
+        }else{
+            removeButton.setEnabled(false);
+        }
         statusLabel.setText(streamUpdatable.currentMetadata().toString());
     }
     
@@ -191,6 +199,9 @@ public class MediaQueuePanel extends javax.swing.JPanel implements StreamListene
     
     private void addMediaFile(File... files){
         for(File file : files){
+            if(Thread.currentThread().isInterrupted()){
+                return;
+            }
             if(isMp3File(file)){
                 AudioMedia media = new AudioMedia(file.getPath());
                 streamUpdatable.addMedia(media);
@@ -214,6 +225,7 @@ public class MediaQueuePanel extends javax.swing.JPanel implements StreamListene
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable = new javax.swing.JTable();
         addButton = new javax.swing.JButton();
+        removeButton = new javax.swing.JButton();
 
         setBorder(javax.swing.BorderFactory.createTitledBorder("Queue"));
 
@@ -260,11 +272,24 @@ public class MediaQueuePanel extends javax.swing.JPanel implements StreamListene
         jTable.getColumnModel().getColumn(2).setCellRenderer(new caja.gui.jtable.ButtonRenderer());
 
         addButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/add.png"))); // NOI18N
+        addButton.setToolTipText("Add media files");
         addButton.setMaximumSize(new java.awt.Dimension(50, 25));
         addButton.setMinimumSize(new java.awt.Dimension(50, 25));
+        addButton.setPreferredSize(new java.awt.Dimension(50, 25));
         addButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 addButtonActionPerformed(evt);
+            }
+        });
+
+        removeButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/remove.png"))); // NOI18N
+        removeButton.setToolTipText("Remove all");
+        removeButton.setMaximumSize(new java.awt.Dimension(50, 25));
+        removeButton.setMinimumSize(new java.awt.Dimension(50, 25));
+        removeButton.setPreferredSize(new java.awt.Dimension(50, 25));
+        removeButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                removeButtonActionPerformed(evt);
             }
         });
 
@@ -277,8 +302,11 @@ public class MediaQueuePanel extends javax.swing.JPanel implements StreamListene
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(addButton, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                                .addComponent(addButton, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(removeButton, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
                             .addComponent(jLabel2))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(statusLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 267, javax.swing.GroupLayout.PREFERRED_SIZE)))
@@ -291,7 +319,9 @@ public class MediaQueuePanel extends javax.swing.JPanel implements StreamListene
                     .addComponent(jLabel2)
                     .addComponent(statusLabel))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(addButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(addButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(removeButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 107, Short.MAX_VALUE)
                 .addContainerGap())
@@ -309,7 +339,7 @@ public class MediaQueuePanel extends javax.swing.JPanel implements StreamListene
         int returnVal = chooser.showOpenDialog(null);
         if(returnVal == JFileChooser.APPROVE_OPTION) {
             final File[] selectedFiles = chooser.getSelectedFiles();
-            SwingWorker worker = new SwingWorker<Void, Void>() {
+            final SwingWorker worker = new SwingWorker<Void, Void>() {
                 @Override
                 protected Void doInBackground() throws Exception {
                     addMediaFile(selectedFiles);
@@ -322,16 +352,27 @@ public class MediaQueuePanel extends javax.swing.JPanel implements StreamListene
                     refresh();
                 }
             };
+            WindowAdapter wa = new WindowAdapter() {
+                @Override
+                public void windowClosing(WindowEvent e) {
+                    worker.cancel(true);
+                }
+            };
             worker.execute();
-            WaitDialog.showMsg();
+            WaitDialog.showMsg(wa);
         }
     }//GEN-LAST:event_addButtonActionPerformed
+
+    private void removeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeButtonActionPerformed
+        streamUpdatable.emptyMediaQueue();
+    }//GEN-LAST:event_removeButtonActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton addButton;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable jTable;
+    private javax.swing.JButton removeButton;
     private javax.swing.JLabel statusLabel;
     // End of variables declaration//GEN-END:variables
 
