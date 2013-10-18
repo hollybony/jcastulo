@@ -4,6 +4,7 @@
  */
 package caja.gui.utils;
 
+import java.awt.event.WindowListener;
 import javax.swing.JFrame;
 
 /**
@@ -33,8 +34,15 @@ public class WaitDialog extends javax.swing.JDialog {
      * Shows the wait dialog
      */
     public static void showMsg(){
+        showMsg(null);
+    }
+    
+    public static void showMsg(WindowListener wl){
         if(waitDialog==null){
             waitDialog = new WaitDialog((JFrame) null, true);
+        }
+        if(wl!=null){
+            waitDialog.addWindowListener(wl);
         }
         waitDialog.setVisible(true);
     }
@@ -44,6 +52,10 @@ public class WaitDialog extends javax.swing.JDialog {
      */
     public static void hideMsg(){
         if(waitDialog!=null){
+            WindowListener[] windowListeners = waitDialog.getWindowListeners();
+            for(WindowListener wl : windowListeners){
+                waitDialog.removeWindowListener(wl);
+            }
             waitDialog.setVisible(false);
         }
     }
@@ -57,15 +69,16 @@ public class WaitDialog extends javax.swing.JDialog {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jProgressBar1 = new javax.swing.JProgressBar();
+        progressBar = new javax.swing.JProgressBar();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         setModal(true);
+        setName("dialog"); // NOI18N
         setResizable(false);
 
-        jProgressBar1.setIndeterminate(true);
-        jProgressBar1.setString("Running...");
-        jProgressBar1.setStringPainted(true);
+        progressBar.setIndeterminate(true);
+        progressBar.setString("Running...");
+        progressBar.setStringPainted(true);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -73,14 +86,14 @@ public class WaitDialog extends javax.swing.JDialog {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jProgressBar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(progressBar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jProgressBar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(progressBar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -88,6 +101,6 @@ public class WaitDialog extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JProgressBar jProgressBar1;
+    private javax.swing.JProgressBar progressBar;
     // End of variables declaration//GEN-END:variables
 }
