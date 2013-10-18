@@ -216,7 +216,7 @@ public class ListenerClerk implements Runnable {
     protected void writeStartStreamResponse(String name, Request request, OutputStream out) throws IOException {
         StringBuilder response = new StringBuilder();
         if(request.isBrowserUserAgent()){
-            response.append("HTTP/1.1 200 OK\r\nContent-Type: audio/mpeg\r\n");
+            response.append("HTTP/1.1 200 OK\r\n");
         }else{
             response.append("ICY 200 OK\r\n");
         }
@@ -232,9 +232,26 @@ public class ListenerClerk implements Runnable {
         if(request.isMetadataRequested()){
             response.append("icy-metaint:").append(METADATA_INTERVAL).append("\r\n");
         }
-        response.append("icy-br:128\r\n");
+        int bitrate = getBitrate();
+        if(bitrate!=0){
+            response.append("icy-br:").append(bitrate).append("\r\n");
+        }
         response.append("\r\n");
         out.write(response.toString().getBytes());
+    }
+    
+    /**
+     * @return bitrate in kbps
+     */
+    private int getBitrate(){
+        String property = System.getProperty("bitrate");
+        int bitrate = 0;
+        try{
+            bitrate = Integer.parseInt(property)/1000;
+        }catch(NumberFormatException ex){}
+        finally{
+            return bitrate;
+        }
     }
 
     /**
