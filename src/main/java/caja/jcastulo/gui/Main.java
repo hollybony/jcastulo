@@ -29,6 +29,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 public class Main extends javax.swing.JFrame {
 
     final org.slf4j.Logger logger = LoggerFactory.getLogger(Main.class);
+    
     /**
      * Spring context
      */
@@ -144,14 +145,14 @@ public class Main extends javax.swing.JFrame {
      * @param evt
      */
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
-        SwingWorker worker = new SwingWorker<Void,Void>() {
-          
+        SwingWorker worker = new SwingWorker<Void, Void>() {
             @Override
             protected Void doInBackground() throws Exception {
                 serverPanel.cleanup();
                 streamsPanel.cleanup();
                 return null;
             }
+
             @Override
             protected void done() {
                 WaitDialog.hideMsg();
@@ -187,14 +188,35 @@ public class Main extends javax.swing.JFrame {
             java.util.logging.Logger.getLogger(Main.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
+        
+        
+        
+        final SwingWorker worker = new SwingWorker<Void, Void>() {
+            Main main;
+            
+            @Override
+            protected Void doInBackground() throws Exception {
+                main = new Main();
+                return null;
+            }
+
+            @Override
+            protected void done() {
+                WaitDialog.hideMsg();
+                main.setVisible(true);
+            }
+        };
+        worker.execute();
+        WaitDialog.showMsg();
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                new Main().setVisible(true);
-            }
-        });
+//        java.awt.EventQueue.invokeLater(new Runnable() {
+//            @Override
+//            public void run() {
+//                Main main = new Main();
+//                main.setVisible(true);
+//            }
+//        });
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private caja.gui.log.ConsolePanel consolePanel;
