@@ -16,7 +16,7 @@ public class Request {
      */
     private static final Pattern getRegexp = Pattern.compile("GET\\s+([^\\s]+).*", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
     
-    private static final Pattern agentRegexp = Pattern.compile("User-Agent:\\s*([\\S]+).*", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+    private static final Pattern agentRegexp = Pattern.compile("User-Agent:\\s*(.+)", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
     
     private static final Pattern icyMetadataRegexp = Pattern.compile("Icy-MetaData:\\s*(1).*", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
     
