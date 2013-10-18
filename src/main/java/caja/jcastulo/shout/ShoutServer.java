@@ -18,7 +18,7 @@ public class ShoutServer implements Runnable, ServerObservable {
     
     private ServerSocket serverSocket;
         
-    protected ListenerClerkManager shoutRunnableManager;
+    protected ListenerClerkManager listenerClerkManager;
     
     protected int port;
     
@@ -27,7 +27,7 @@ public class ShoutServer implements Runnable, ServerObservable {
     private List<ServerListener> serverListeners;
 
     public ShoutServer(ListenerClerkManager shoutRunnableManager, int serverPort) {
-        this.shoutRunnableManager = shoutRunnableManager;
+        this.listenerClerkManager = shoutRunnableManager;
         this.port = serverPort;
         serverListeners = new ArrayList<ServerListener>();
     }
@@ -59,7 +59,7 @@ public class ShoutServer implements Runnable, ServerObservable {
         while (true) {
             try {
                 Socket clientSocket = serverSocket.accept();
-                shoutRunnableManager.attendListener(clientSocket);
+                listenerClerkManager.attendListener(clientSocket);
             } catch (SocketException ex) {
                 if (Thread.interrupted()) {
                     cleanup();
@@ -97,7 +97,7 @@ public class ShoutServer implements Runnable, ServerObservable {
                         Thread.sleep(333);
                     }
                     if(!thread.isAlive()){
-                        if(!shoutRunnableManager.shutdown()){
+                        if(!listenerClerkManager.shutdown()){
                             logger.warn("execution service could not be terminated");
                         }
                         logger.info("server has been stopped");
