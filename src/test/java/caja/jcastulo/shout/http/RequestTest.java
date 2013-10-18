@@ -15,6 +15,7 @@ public class RequestTest {
         String httpRequest = "GET /media.mp3 HTTP/1.0\n\rHost: localhost\n\rUser-Agent: xmms/1.2.10\n\rIcy-MetaData:1\n\r\n\r";
         Request request = new Request(httpRequest);
         assertEquals("/media.mp3", request.getPath());
+        assertEquals("xmms/1.2.10", request.getUserAgent());
         assertFalse(request.isBrowserUserAgent());
         assertTrue(request.isMetadataRequested());
         /////////////////
@@ -24,6 +25,7 @@ public class RequestTest {
             "Accept-Encoding: gzip,deflate,sdch\n\rAccept-Language: en-US,en;q=0.8";
         request = new Request(chromeRequest);
         assertEquals("/folk.mp3", request.getPath());
+        assertEquals("Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/30.0.1599.69 Safari/537.36", request.getUserAgent());
         assertTrue(request.isBrowserUserAgent());
         assertFalse(request.isMetadataRequested());
         /////////////////
@@ -31,6 +33,7 @@ public class RequestTest {
                 "Ultravox-transport-type: TCP\n\rAccept: */*\n\rIcy-MetaData:1";
         request = new Request(winampRequest);
         assertEquals("/folk.mp3", request.getPath());
+        assertEquals("WinampMPEG/5.63, Ultravox/2.1", request.getUserAgent());
         assertFalse(request.isBrowserUserAgent());
         assertTrue(request.isMetadataRequested());
     }
