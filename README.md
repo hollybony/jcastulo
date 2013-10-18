@@ -17,9 +17,6 @@ Frameworks used
 - Xuggler 5.3
 
 Coming fixes/changes
-- Option of canceling media audio load
-- Opening message when GUI starting
-- Verify jcastulo already opened to avoid opening more than one instance
 - Configuration properties file that includes
   * Port
   * Domain (if not specified then use IP address)
