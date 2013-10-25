@@ -12,6 +12,11 @@ import caja.jcastulo.stream.services.StreamManagersService;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import javax.swing.DefaultListSelectionModel;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -28,8 +33,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
  */
 public class Main extends javax.swing.JFrame {
 
-    final org.slf4j.Logger logger = LoggerFactory.getLogger(Main.class);
-    
+    final static org.slf4j.Logger logger = LoggerFactory.getLogger(Main.class);
     /**
      * Spring context
      */
@@ -40,10 +44,14 @@ public class Main extends javax.swing.JFrame {
      * <code>Main</code> class
      */
     public Main() {
+        logger.debug("initializating components");
         initComponents();
+        logger.debug("components initialized");
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
         setLocation((dim.width - getSize().width) / 2, (dim.height - getSize().height) / 2);
+        logger.debug("initializating context");
         initContext();
+        logger.debug("contex initialized");
     }
 
     /**
@@ -67,6 +75,8 @@ public class Main extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("JCastulo");
+        setMinimumSize(new java.awt.Dimension(1020, 600));
+        setPreferredSize(new java.awt.Dimension(1020, 600));
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
                 formWindowClosing(evt);
@@ -80,6 +90,9 @@ public class Main extends javax.swing.JFrame {
         verticalSplit.setMaximumSize(new java.awt.Dimension(2147483647, 240));
         verticalSplit.setPreferredSize(new java.awt.Dimension(1003, 240));
 
+        topLeftPanel.setMinimumSize(new java.awt.Dimension(333, 300));
+        topLeftPanel.setPreferredSize(new java.awt.Dimension(333, 300));
+
         javax.swing.GroupLayout topLeftPanelLayout = new javax.swing.GroupLayout(topLeftPanel);
         topLeftPanel.setLayout(topLeftPanelLayout);
         topLeftPanelLayout.setHorizontalGroup(
@@ -87,7 +100,7 @@ public class Main extends javax.swing.JFrame {
             .addGroup(topLeftPanelLayout.createSequentialGroup()
                 .addGroup(topLeftPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(streamsPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                    .addComponent(serverPanel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 302, Short.MAX_VALUE))
+                    .addComponent(serverPanel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         topLeftPanelLayout.setVerticalGroup(
@@ -95,7 +108,7 @@ public class Main extends javax.swing.JFrame {
             .addGroup(topLeftPanelLayout.createSequentialGroup()
                 .addComponent(serverPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(streamsPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 143, Short.MAX_VALUE))
+                .addComponent(streamsPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 205, Short.MAX_VALUE))
         );
 
         verticalSplit.setLeftComponent(topLeftPanel);
@@ -105,13 +118,13 @@ public class Main extends javax.swing.JFrame {
         topRightPanelLayout.setHorizontalGroup(
             topRightPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(topRightPanelLayout.createSequentialGroup()
-                .addComponent(mediaQueuePanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(mediaQueuePanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(listenersPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(listenersPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 297, Short.MAX_VALUE))
         );
         topRightPanelLayout.setVerticalGroup(
             topRightPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(mediaQueuePanel, javax.swing.GroupLayout.DEFAULT_SIZE, 238, Short.MAX_VALUE)
+            .addComponent(mediaQueuePanel, javax.swing.GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE)
             .addComponent(listenersPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
@@ -132,7 +145,7 @@ public class Main extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(horizontalSplit, javax.swing.GroupLayout.DEFAULT_SIZE, 329, Short.MAX_VALUE)
+                .addComponent(horizontalSplit, javax.swing.GroupLayout.DEFAULT_SIZE, 370, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -188,35 +201,37 @@ public class Main extends javax.swing.JFrame {
             java.util.logging.Logger.getLogger(Main.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
-        
-        
-        
-        final SwingWorker worker = new SwingWorker<Void, Void>() {
-            Main main;
-            
-            @Override
-            protected Void doInBackground() throws Exception {
-                main = new Main();
-                return null;
-            }
-
-            @Override
-            protected void done() {
-                WaitDialog.hideMsg();
-                main.setVisible(true);
-            }
-        };
-        worker.execute();
-        WaitDialog.showMsg();
 
         /* Create and display the form */
-//        java.awt.EventQueue.invokeLater(new Runnable() {
-//            @Override
-//            public void run() {
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                initUI();
 //                Main main = new Main();
 //                main.setVisible(true);
-//            }
-//        });
+
+            }
+        });
+    }
+
+    protected static void initUI() {
+        final JDialog dialog = new JDialog((JFrame) null,true);
+        dialog.setUndecorated(true);
+        JPanel panel = new JPanel();
+        JLabel label = new JLabel("Please wait...");
+        panel.add(label);
+        dialog.add(panel);
+        dialog.pack();
+        dialog.setLocationRelativeTo(null);
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {Main main;
+                main = new Main();
+                dialog.setVisible(false);
+                main.setVisible(true);
+            }
+        });
+        dialog.setVisible(true);
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private caja.gui.log.ConsolePanel consolePanel;
