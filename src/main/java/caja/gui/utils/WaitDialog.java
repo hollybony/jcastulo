@@ -29,7 +29,6 @@ public class WaitDialog extends javax.swing.JDialog {
         setLocationRelativeTo(null);
     }
     
-    
     /**
      * Shows the wait dialog
      */
@@ -38,26 +37,26 @@ public class WaitDialog extends javax.swing.JDialog {
     }
     
     public static void showMsg(WindowListener wl){
-        if(waitDialog==null){
-            waitDialog = new WaitDialog((JFrame) null, true);
-        }
-        if(wl!=null){
-            waitDialog.addWindowListener(wl);
-        }
-        waitDialog.setVisible(true);
+            if(waitDialog==null){
+                waitDialog = new WaitDialog((JFrame) null, true);
+            }
+            if(wl!=null){
+                waitDialog.addWindowListener(wl);
+            }
+            waitDialog.setVisible(true);
     }
     
     /**
      * Hides the wait dialog
      */
     public static void hideMsg(){
-        if(waitDialog!=null){
-            WindowListener[] windowListeners = waitDialog.getWindowListeners();
-            for(WindowListener wl : windowListeners){
-                waitDialog.removeWindowListener(wl);
+            if(waitDialog!=null){
+                WindowListener[] windowListeners = waitDialog.getWindowListeners();
+                for(WindowListener wl : windowListeners){
+                    waitDialog.removeWindowListener(wl);
+                }
+                waitDialog.setVisible(false);
             }
-            waitDialog.setVisible(false);
-        }
     }
 
     /**
