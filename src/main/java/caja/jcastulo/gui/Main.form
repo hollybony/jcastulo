@@ -34,7 +34,7 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="1" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="horizontalSplit" pref="990" max="32767" attributes="0"/>
+              <Component id="horizontalSplit" pref="1000" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
@@ -103,7 +103,7 @@
                       <Group type="102" attributes="0">
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Component id="streamsPanel" pref="0" max="32767" attributes="0"/>
-                              <Component id="serverPanel" alignment="1" max="32767" attributes="0"/>
+                              <Component id="serverPanel" alignment="1" pref="323" max="32767" attributes="0"/>
                           </Group>
                           <EmptySpace min="-2" max="-2" attributes="0"/>
                       </Group>
@@ -137,9 +137,9 @@
                 <DimensionLayout dim="0">
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="0" attributes="0">
-                          <Component id="mediaQueuePanel" max="32767" attributes="0"/>
-                          <EmptySpace min="-2" max="-2" attributes="0"/>
-                          <Component id="listenersPanel" pref="297" max="32767" attributes="0"/>
+                          <Component id="mediaQueuePanel" pref="399" max="32767" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="listenersPanel" min="-2" pref="253" max="-2" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
