@@ -178,6 +178,9 @@ public class OneToOneClerkManager implements ListenerClerkManager {
                 listenersFound.add(taskHolder.clientSpec);
             }
         }
+        if(listenersFound.isEmpty()){
+            logger.debug("client specs for " + mountpoint + " were not found");
+        }
         return listenersFound;
     }
 

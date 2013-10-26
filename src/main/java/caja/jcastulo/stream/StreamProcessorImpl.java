@@ -364,10 +364,8 @@ public class StreamProcessorImpl implements StreamUpdateable {
                 }
             }else if (status.equals(Status.PLAYING)){
                 synchronized (streamSpec.getAudioMedias()) {
-                    if(streamSpec.getAudioMedias().size()>1){
-                        for(int i=1;i<streamSpec.getAudioMedias().size();i++){
-                            streamSpec.getAudioMedias().remove(i);
-                        }
+                    while(streamSpec.getAudioMedias().size()>1){
+                        streamSpec.getAudioMedias().remove(1);
                     }
                 }
                 status = Status.CURRENT_MEDIA_CHANGE_REQUESTED;
