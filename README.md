@@ -23,3 +23,4 @@ Coming fixes/changes
   * Log location (if not specified then use the same dir)
   * datasource info (if not specified then use H2) option for javaDB files should be in the same dir
 - Test what happens if port is deny to be opened
+- Resize queue num column enough for 4 digits
