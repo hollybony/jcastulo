@@ -10,6 +10,7 @@ import caja.jcastulo.shout.ListenerUpdatesListener;
 import java.util.List;
 import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
+import org.slf4j.LoggerFactory;
 
 /**
  * Panel that shows the stream listeners at real time
@@ -19,9 +20,14 @@ import javax.swing.table.DefaultTableModel;
 public class ListenersPanel extends javax.swing.JPanel {
     
     /**
+     * The logger
+     */
+    final org.slf4j.Logger logger = LoggerFactory.getLogger(ListenersPanel.class);
+    
+    /**
      * The listenerClerksManager
      */
-    private ListenerClerkManager listenersManager;
+    private ListenerClerkManager listenerClerkManager;
     
     /**
      * The current mountPoint for which its listeners will be showed
@@ -34,10 +40,11 @@ public class ListenersPanel extends javax.swing.JPanel {
     private ListenerUpdatesListener listener = new ListenerUpdatesListener() {
 
         @Override
-        public void listenerHasArrived(ClientSpec clientSpec) {
+        public void listenerHasArrived(final ClientSpec clientSpec) {
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
+                    logger.debug("a client has arrived : " + clientSpec);
                     refresh();
                 }
             });
@@ -74,19 +81,19 @@ public class ListenersPanel extends javax.swing.JPanel {
      */
     private void refresh(){
         DefaultTableModel model = (DefaultTableModel) jTable.getModel();
-        List<ClientSpec> clientSpecs = listenersManager.getClientSpecsByMountpoint(currentMountPoint);
+        List<ClientSpec> clientSpecs = listenerClerkManager.getClientSpecsByMountpoint(currentMountPoint);
         model.setRowCount(0);
         for(ClientSpec clientSpec : clientSpecs){
-            model.addRow(new Object[]{clientSpec.getIp(),clientSpec.getPort()});
+            model.addRow(new Object[]{clientSpec.getIp(), clientSpec.getPort()});
         }
     }
     
     /**
      * @param listenersManager - the listenersManager to set
      */
-    public void setListenersManager(ListenerClerkManager listenersManager) {
-        this.listenersManager = listenersManager;
-        this.listenersManager.addListenerUpdatesListener(listener);
+    public void setListenersManager(ListenerClerkManager listenerClerkManager) {
+        this.listenerClerkManager = listenerClerkManager;
+        this.listenerClerkManager.addListenerUpdatesListener(listener);
     }
 
     
@@ -130,8 +137,9 @@ public class ListenersPanel extends javax.swing.JPanel {
                 return canEdit [columnIndex];
             }
         });
-        jTable.setMaximumSize(new java.awt.Dimension(80, 0));
-        jTable.setPreferredSize(new java.awt.Dimension(80, 0));
+        jTable.setMaximumSize(new java.awt.Dimension(80, 1000));
+        jTable.setMinimumSize(new java.awt.Dimension(30, 30));
+        jTable.setPreferredSize(new java.awt.Dimension(80, 30));
         jScrollPane1.setViewportView(jTable);
         jTable.getColumnModel().getColumn(0).setResizable(false);
         jTable.getColumnModel().getColumn(0).setPreferredWidth(100);
@@ -151,7 +159,7 @@ public class ListenersPanel extends javax.swing.JPanel {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 135, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 61, Short.MAX_VALUE)
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
