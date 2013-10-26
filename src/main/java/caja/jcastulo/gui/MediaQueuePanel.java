@@ -8,6 +8,7 @@ import caja.gui.jtable.ActionModel;
 import caja.gui.utils.WaitDialog;
 import caja.jcastulo.media.entities.AudioMedia;
 import caja.jcastulo.stream.StreamListener;
+import caja.jcastulo.stream.StreamManager;
 import caja.jcastulo.stream.StreamUpdateable;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
@@ -50,18 +51,6 @@ public class MediaQueuePanel extends javax.swing.JPanel implements StreamListene
      * The chooser to choose audio files
      */
     private JFileChooser chooser;
-    
-    /**
-     * The listener that performs audio media removals to the stream
-     */
-    private ActionListener removeListener = new ActionListener() {
-        
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            int index = (Integer) e.getSource();
-            streamUpdatable.removeMedia(index);
-        }
-    };
     
     private TransferHandler transferHandler = new TransferHandler(){
             
@@ -146,8 +135,7 @@ public class MediaQueuePanel extends javax.swing.JPanel implements StreamListene
      */
     public MediaQueuePanel() {
         initComponents();
-        jTable.setRowHeight(26);
-        jTable.setTransferHandler(transferHandler);
+        mediaFilesTable.setTransferHandler(transferHandler);
         addButton.setEnabled(false);
         removeButton.setEnabled(false);
     }
@@ -171,15 +159,13 @@ public class MediaQueuePanel extends javax.swing.JPanel implements StreamListene
      */
     private void refresh() {
         addButton.setEnabled(true);
-        DefaultTableModel model = (DefaultTableModel) jTable.getModel();
+        DefaultTableModel model = (DefaultTableModel) mediaFilesTable.getModel();
         model.setRowCount(0);
         int i = 0;
         for (AudioMedia media : streamUpdatable.getStreamSpec().getAudioMedias()) {
-            ActionModel removeModel = ActionModels.getInstance().getActionModel("images/remove.png").copy();
-            removeModel.setPayload(i);
-            model.addRow(new Object[]{++i, media.toString(),removeModel});
+            model.addRow(new Object[]{++i, media.toString()});
         }
-        if(jTable.getRowCount()>0){
+        if(mediaFilesTable.getRowCount()>0){
             removeButton.setEnabled(true);
         }else{
             removeButton.setEnabled(false);
@@ -220,12 +206,22 @@ public class MediaQueuePanel extends javax.swing.JPanel implements StreamListene
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        popupMenu = new javax.swing.JPopupMenu();
+        deleteMenuItem = new javax.swing.JMenuItem();
         jLabel2 = new javax.swing.JLabel();
         statusLabel = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable = new javax.swing.JTable();
+        mediaFilesTable = new javax.swing.JTable();
         addButton = new javax.swing.JButton();
         removeButton = new javax.swing.JButton();
+
+        deleteMenuItem.setText("Delete");
+        deleteMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                deleteMenuItemActionPerformed(evt);
+            }
+        });
+        popupMenu.add(deleteMenuItem);
 
         setBorder(javax.swing.BorderFactory.createTitledBorder("Queue"));
 
@@ -234,19 +230,19 @@ public class MediaQueuePanel extends javax.swing.JPanel implements StreamListene
         statusLabel.setForeground(new java.awt.Color(0, 153, 255));
         statusLabel.setText("nothing");
 
-        jTable.setModel(new javax.swing.table.DefaultTableModel(
+        mediaFilesTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
             },
             new String [] {
-                "#", "Media", ""
+                "#", "Media"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.String.class, java.lang.String.class, java.lang.Object.class
+                java.lang.String.class, java.lang.String.class
             };
             boolean[] canEdit = new boolean [] {
-                false, false, true
+                false, false
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -257,19 +253,19 @@ public class MediaQueuePanel extends javax.swing.JPanel implements StreamListene
                 return canEdit [columnIndex];
             }
         });
-        jTable.setDragEnabled(true);
-        jTable.setDropMode(javax.swing.DropMode.INSERT_ROWS);
-        jTable.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
-        jTable.getTableHeader().setReorderingAllowed(false);
-        jScrollPane1.setViewportView(jTable);
-        jTable.getColumnModel().getColumn(0).setMinWidth(20);
-        jTable.getColumnModel().getColumn(0).setPreferredWidth(25);
-        jTable.getColumnModel().getColumn(0).setMaxWidth(30);
-        jTable.getColumnModel().getColumn(2).setMinWidth(50);
-        jTable.getColumnModel().getColumn(2).setPreferredWidth(50);
-        jTable.getColumnModel().getColumn(2).setMaxWidth(50);
-        jTable.getColumnModel().getColumn(2).setCellEditor(new caja.gui.jtable.ButtonEditor(removeListener));
-        jTable.getColumnModel().getColumn(2).setCellRenderer(new caja.gui.jtable.ButtonRenderer());
+        mediaFilesTable.setDragEnabled(true);
+        mediaFilesTable.setDropMode(javax.swing.DropMode.INSERT_ROWS);
+        mediaFilesTable.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        mediaFilesTable.getTableHeader().setReorderingAllowed(false);
+        mediaFilesTable.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                mediaFilesTableMouseReleased(evt);
+            }
+        });
+        jScrollPane1.setViewportView(mediaFilesTable);
+        mediaFilesTable.getColumnModel().getColumn(0).setMinWidth(20);
+        mediaFilesTable.getColumnModel().getColumn(0).setPreferredWidth(25);
+        mediaFilesTable.getColumnModel().getColumn(0).setMaxWidth(30);
 
         addButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/add.png"))); // NOI18N
         addButton.setToolTipText("Add media files");
@@ -308,8 +304,8 @@ public class MediaQueuePanel extends javax.swing.JPanel implements StreamListene
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(removeButton, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
                             .addComponent(jLabel2))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(statusLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 267, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(statusLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 267, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -367,11 +363,32 @@ public class MediaQueuePanel extends javax.swing.JPanel implements StreamListene
         streamUpdatable.emptyMediaQueue();
     }//GEN-LAST:event_removeButtonActionPerformed
 
+    private void deleteMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteMenuItemActionPerformed
+        int selectedRow = mediaFilesTable.getSelectedRow();
+        if(selectedRow>=0){
+            streamUpdatable.removeMedia(selectedRow);
+        }
+    }//GEN-LAST:event_deleteMenuItemActionPerformed
+
+    private void mediaFilesTableMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_mediaFilesTableMouseReleased
+        if (evt.isPopupTrigger()){
+            JTable source = (JTable)evt.getSource();
+            int row = source.rowAtPoint(evt.getPoint() );
+            int column = source.columnAtPoint(evt.getPoint() );
+            if (!source.isRowSelected(row)){
+                source.changeSelection(row, column, false, false);               
+            }
+            popupMenu.show(evt.getComponent(), evt.getX(), evt.getY());
+        }
+    }//GEN-LAST:event_mediaFilesTableMouseReleased
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton addButton;
+    private javax.swing.JMenuItem deleteMenuItem;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable jTable;
+    private javax.swing.JTable mediaFilesTable;
+    private javax.swing.JPopupMenu popupMenu;
     private javax.swing.JButton removeButton;
     private javax.swing.JLabel statusLabel;
     // End of variables declaration//GEN-END:variables
