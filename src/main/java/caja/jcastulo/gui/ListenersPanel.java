@@ -103,6 +103,9 @@ public class ListenersPanel extends javax.swing.JPanel {
         jTable = new javax.swing.JTable();
 
         setBorder(javax.swing.BorderFactory.createTitledBorder("Listeners"));
+        setMaximumSize(new java.awt.Dimension(120, 32767));
+        setMinimumSize(new java.awt.Dimension(230, 80));
+        setPreferredSize(new java.awt.Dimension(120, 80));
 
         jTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -127,11 +130,13 @@ public class ListenersPanel extends javax.swing.JPanel {
                 return canEdit [columnIndex];
             }
         });
+        jTable.setMaximumSize(new java.awt.Dimension(80, 0));
+        jTable.setPreferredSize(new java.awt.Dimension(80, 0));
         jScrollPane1.setViewportView(jTable);
-        jTable.getColumnModel().getColumn(0).setMinWidth(200);
-        jTable.getColumnModel().getColumn(0).setPreferredWidth(220);
-        jTable.getColumnModel().getColumn(0).setMaxWidth(230);
+        jTable.getColumnModel().getColumn(0).setResizable(false);
+        jTable.getColumnModel().getColumn(0).setPreferredWidth(100);
         jTable.getColumnModel().getColumn(1).setResizable(false);
+        jTable.getColumnModel().getColumn(1).setPreferredWidth(20);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -139,8 +144,8 @@ public class ListenersPanel extends javax.swing.JPanel {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 285, Short.MAX_VALUE)
-                .addContainerGap())
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 215, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
