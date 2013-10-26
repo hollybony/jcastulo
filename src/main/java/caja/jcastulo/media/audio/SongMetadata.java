@@ -52,17 +52,17 @@ public class SongMetadata {
 
     @Override
     public String toString() {
-        StringBuilder builder = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         for (MetadataType type : data.keySet()) {
             String value = data.get(type);
             if(value!=null){
-                builder.append(data.get(type)).append(", ");
+                sb.append(" ").append(data.get(type)).append(" -");
             }
         }
-        if (builder.length() > 0) {
-            builder.setLength(builder.length() - 2);
+        if (sb.length() > 0) {
+            sb.setLength(sb.length() - 2);
         }
-        return builder.toString();
+        return sb.toString();
     }
 
     @Override
