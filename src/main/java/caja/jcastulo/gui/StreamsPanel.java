@@ -98,7 +98,7 @@ public class StreamsPanel extends javax.swing.JPanel {
         });
         popupMenu.add(stopMenuItem);
 
-        deleteMenuItem.setText("delete");
+        deleteMenuItem.setText("Delete");
         deleteMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 deleteMenuItemActionPerformed(evt);
@@ -132,6 +132,7 @@ public class StreamsPanel extends javax.swing.JPanel {
                 return canEdit [columnIndex];
             }
         });
+        streamsTable.setMaximumSize(new java.awt.Dimension(2147483647, 500));
         streamsTable.setMinimumSize(new java.awt.Dimension(0, 0));
         streamsTable.setPreferredSize(new java.awt.Dimension(100, 70));
         streamsTable.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
@@ -174,8 +175,8 @@ public class StreamsPanel extends javax.swing.JPanel {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 84, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 119, Short.MAX_VALUE)
+                .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -246,7 +247,7 @@ public class StreamsPanel extends javax.swing.JPanel {
             JTable source = (JTable)evt.getSource();
             int row = source.rowAtPoint(evt.getPoint() );
             int column = source.columnAtPoint(evt.getPoint() );
-            if (! source.isRowSelected(row)){
+            if (!source.isRowSelected(row)){
                 source.changeSelection(row, column, false, false);               
             }
             String streamName = (String) source.getModel().getValueAt(row, 0);
