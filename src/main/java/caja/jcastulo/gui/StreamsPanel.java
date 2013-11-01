@@ -4,14 +4,18 @@
  */
 package caja.jcastulo.gui;
 
+import caja.gui.jtable.Colorable;
 import caja.gui.utils.WaitDialog;
 import caja.jcastulo.stream.StreamManager;
 import caja.jcastulo.stream.entities.StreamSpec;
 import caja.jcastulo.stream.services.StreamManagersService;
+import java.awt.Color;
 import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.SwingWorker;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import org.slf4j.LoggerFactory;
@@ -43,16 +47,37 @@ public class StreamsPanel extends javax.swing.JPanel {
         DefaultTableModel model = (DefaultTableModel) streamsTable.getModel();
         List<StreamManager> streamManagers = streamManagersService.getAllStreamManagers();
         model.setRowCount(0);
-        for (StreamManager streamManager : streamManagers) {
-            if (streamManager.isRunning()) {
+        for (final StreamManager streamManager : streamManagers) {
+//            model.addRow(new Object[]{streamManager.getStreamName(),streamManager.getMountPoint()});
+            final Color color = streamManager.isRunning()?Color.GREEN:null; 
+            model.addRow(new Object[]{
+                new Colorable() {
+
+                    @Override
+                    public Color getColor() {
+                        return color;
+                    }
                 
-            } else {
+                    @Override
+                    public String toString(){
+                        return streamManager.getStreamName();
+                    }
+                },
+                new Colorable() {
+
+                    @Override
+                    public Color getColor() {
+                        return color;
+                    }
                 
-            }            
-            model.addRow(new Object[]{streamManager.getStreamName(), streamManager.getMountPoint()});
+                    @Override
+                    public String toString(){
+                        return streamManager.getMountPoint();
+                    }
+                }
+            });
         }
     }
-
     public void cleanup() {
         List<StreamManager> streamManagers = streamManagersService.getAllStreamManagers();
         for (StreamManager streamManager : streamManagers) {
@@ -80,120 +105,190 @@ public class StreamsPanel extends javax.swing.JPanel {
         deleteMenuItem = new javax.swing.JMenuItem();
         jScrollPane1 = new javax.swing.JScrollPane();
         streamsTable = new javax.swing.JTable();
-        jButton1 = new javax.swing.JButton();
-
-        startMenuItem.setText("Start");
-        startMenuItem.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                startMenuItemActionPerformed(evt);
+        streamsTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+            public void valueChanged(ListSelectionEvent event) {
+                updateCtrlButton(event);
             }
-        });
-        popupMenu.add(startMenuItem);
+        }
+    );
+    addButton = new javax.swing.JButton();
+    startButton = new javax.swing.JButton();
+    deleteButton = new javax.swing.JButton();
+    stopButton = new javax.swing.JButton();
 
-        stopMenuItem.setText("Stop");
-        stopMenuItem.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                stopMenuItemActionPerformed(evt);
-            }
-        });
-        popupMenu.add(stopMenuItem);
+    startMenuItem.setText("Start");
+    startMenuItem.addActionListener(new java.awt.event.ActionListener() {
+        public void actionPerformed(java.awt.event.ActionEvent evt) {
+            startMenuItemActionPerformed(evt);
+        }
+    });
+    popupMenu.add(startMenuItem);
 
-        deleteMenuItem.setText("Delete");
-        deleteMenuItem.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                deleteMenuItemActionPerformed(evt);
-            }
-        });
-        popupMenu.add(deleteMenuItem);
+    stopMenuItem.setText("Stop");
+    stopMenuItem.addActionListener(new java.awt.event.ActionListener() {
+        public void actionPerformed(java.awt.event.ActionEvent evt) {
+            stopMenuItemActionPerformed(evt);
+        }
+    });
+    popupMenu.add(stopMenuItem);
 
-        setBorder(javax.swing.BorderFactory.createTitledBorder("Streams"));
-        setPreferredSize(new java.awt.Dimension(617, 400));
+    deleteMenuItem.setText("Delete");
+    deleteMenuItem.addActionListener(new java.awt.event.ActionListener() {
+        public void actionPerformed(java.awt.event.ActionEvent evt) {
+            deleteMenuItemActionPerformed(evt);
+        }
+    });
+    popupMenu.add(deleteMenuItem);
 
-        streamsTable.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
+    setBorder(javax.swing.BorderFactory.createTitledBorder("Streams"));
+    setPreferredSize(new java.awt.Dimension(617, 400));
 
-            },
-            new String [] {
-                "Name", "Mount Point"
-            }
-        ) {
-            Class[] types = new Class [] {
-                java.lang.String.class, java.lang.String.class
-            };
-            boolean[] canEdit = new boolean [] {
-                false, false
-            };
+    streamsTable.setModel(new javax.swing.table.DefaultTableModel(
+        new Object [][] {
 
-            public Class getColumnClass(int columnIndex) {
-                return types [columnIndex];
-            }
+        },
+        new String [] {
+            "Name", "Mount Point"
+        }
+    ) {
+        boolean[] canEdit = new boolean [] {
+            false, false
+        };
 
-            public boolean isCellEditable(int rowIndex, int columnIndex) {
-                return canEdit [columnIndex];
-            }
-        });
-        streamsTable.setMaximumSize(new java.awt.Dimension(2147483647, 500));
-        streamsTable.setMinimumSize(new java.awt.Dimension(0, 0));
-        streamsTable.setPreferredSize(new java.awt.Dimension(100, 70));
-        streamsTable.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
-        streamsTable.getTableHeader().setReorderingAllowed(false);
-        streamsTable.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                streamsTableMouseReleased(evt);
-            }
-        });
-        jScrollPane1.setViewportView(streamsTable);
-        streamsTable.getColumnModel().getColumn(0).setMinWidth(100);
-        streamsTable.getColumnModel().getColumn(0).setPreferredWidth(100);
-        streamsTable.getColumnModel().getColumn(1).setMinWidth(100);
-        streamsTable.getColumnModel().getColumn(1).setPreferredWidth(100);
+        public boolean isCellEditable(int rowIndex, int columnIndex) {
+            return canEdit [columnIndex];
+        }
+    });
+    streamsTable.setMaximumSize(new java.awt.Dimension(2147483647, 500));
+    streamsTable.setMinimumSize(new java.awt.Dimension(0, 0));
+    streamsTable.setPreferredSize(new java.awt.Dimension(100, 70));
+    streamsTable.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+    streamsTable.getTableHeader().setReorderingAllowed(false);
+    streamsTable.addMouseListener(new java.awt.event.MouseAdapter() {
+        public void mouseReleased(java.awt.event.MouseEvent evt) {
+            streamsTableMouseReleased(evt);
+        }
+    });
+    jScrollPane1.setViewportView(streamsTable);
+    streamsTable.getColumnModel().getColumn(0).setMinWidth(100);
+    streamsTable.getColumnModel().getColumn(0).setPreferredWidth(100);
+    streamsTable.getColumnModel().getColumn(0).setCellRenderer(new caja.gui.jtable.ColorCellRenderer());
+    streamsTable.getColumnModel().getColumn(1).setMinWidth(100);
+    streamsTable.getColumnModel().getColumn(1).setPreferredWidth(100);
+    streamsTable.getColumnModel().getColumn(1).setCellRenderer(new caja.gui.jtable.ColorCellRenderer());
 
-        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/add.png"))); // NOI18N
-        jButton1.setMaximumSize(new java.awt.Dimension(50, 25));
-        jButton1.setMinimumSize(new java.awt.Dimension(50, 25));
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
-            }
-        });
+    addButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/add.png"))); // NOI18N
+    addButton.setMaximumSize(new java.awt.Dimension(50, 25));
+    addButton.setMinimumSize(new java.awt.Dimension(50, 25));
+    addButton.setPreferredSize(new java.awt.Dimension(50, 25));
+    addButton.addActionListener(new java.awt.event.ActionListener() {
+        public void actionPerformed(java.awt.event.ActionEvent evt) {
+            addButtonActionPerformed(evt);
+        }
+    });
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-        this.setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 585, Short.MAX_VALUE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE)))
-                .addContainerGap())
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 119, Short.MAX_VALUE)
-                .addContainerGap())
-        );
+    startButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/play.png"))); // NOI18N
+    startButton.setEnabled(false);
+    startButton.setMaximumSize(new java.awt.Dimension(50, 25));
+    startButton.setMinimumSize(new java.awt.Dimension(50, 25));
+    startButton.setPreferredSize(new java.awt.Dimension(50, 25));
+    startButton.addActionListener(new java.awt.event.ActionListener() {
+        public void actionPerformed(java.awt.event.ActionEvent evt) {
+            startButtonActionPerformed(evt);
+        }
+    });
+
+    deleteButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/remove.png"))); // NOI18N
+    deleteButton.setEnabled(false);
+    deleteButton.addActionListener(new java.awt.event.ActionListener() {
+        public void actionPerformed(java.awt.event.ActionEvent evt) {
+            deleteButtonActionPerformed(evt);
+        }
+    });
+
+    stopButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/stop.png"))); // NOI18N
+    stopButton.setEnabled(false);
+    stopButton.addActionListener(new java.awt.event.ActionListener() {
+        public void actionPerformed(java.awt.event.ActionEvent evt) {
+            stopButtonActionPerformed(evt);
+        }
+    });
+
+    javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
+    this.setLayout(layout);
+    layout.setHorizontalGroup(
+        layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        .addGroup(layout.createSequentialGroup()
+            .addContainerGap()
+            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 585, Short.MAX_VALUE)
+                .addGroup(layout.createSequentialGroup()
+                    .addComponent(addButton, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                    .addComponent(startButton, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                    .addComponent(stopButton, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                    .addComponent(deleteButton, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGap(0, 0, Short.MAX_VALUE)))
+            .addContainerGap())
+    );
+
+    layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {addButton, deleteButton, startButton, stopButton});
+
+    layout.setVerticalGroup(
+        layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addComponent(addButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(startButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(stopButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 26, Short.MAX_VALUE)
+                .addComponent(deleteButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 330, Short.MAX_VALUE)
+            .addContainerGap())
+    );
+
+    layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {addButton, deleteButton, startButton});
+
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
         String streamName = JOptionPane.showInputDialog(null, "Stream name");
         if (streamName != null && !streamName.equals("")) {
             StreamSpec streamSpec = new StreamSpec(streamName);
             streamManagersService.addStreamManager(streamSpec);
             refresh();
         }
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }//GEN-LAST:event_addButtonActionPerformed
 
+    private void updateCtrlButton(ListSelectionEvent event){
+        //        System.out.println(event.getFirstIndex() + " " + event.getLastIndex() + " " + streamsTable.getSelectedRow());
+        int selectedRow = streamsTable.getSelectedRow();
+        if(selectedRow>=0){
+            TableModel model = streamsTable.getModel();
+            final String streamName = model.getValueAt(selectedRow, 0).toString();
+            StreamManager streamManager = streamManagersService.getStreamManagerByName(streamName);
+            deleteButton.setEnabled(true);
+            if(streamManager.isRunning()){
+                startButton.setEnabled(false);
+                stopButton.setEnabled(true);
+            }else{
+                startButton.setEnabled(true);
+                stopButton.setEnabled(false);
+            }
+        }else{
+            deleteButton.setEnabled(false);
+            startButton.setEnabled(false);
+            stopButton.setEnabled(false);
+        }
+    }
+    
     private void startMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_startMenuItemActionPerformed
         int selectedRow = streamsTable.getSelectedRow();
         if(selectedRow>=0){
             TableModel model = streamsTable.getModel();
-            final String streamName = (String) model.getValueAt(selectedRow, 0);
+            final String streamName = model.getValueAt(selectedRow, 0).toString();
             SwingWorker worker = new SwingWorker<Void, Void>() {
                 @Override
                 protected Void doInBackground() throws Exception {
@@ -219,7 +314,7 @@ public class StreamsPanel extends javax.swing.JPanel {
         int selectedRow = streamsTable.getSelectedRow();
         if(selectedRow>=0){
             TableModel model = streamsTable.getModel();
-            final String streamName = (String) model.getValueAt(selectedRow, 0);
+            final String streamName = model.getValueAt(selectedRow, 0).toString();
             SwingWorker worker = new SwingWorker<Void, Void>() {
                 @Override
                 protected Void doInBackground() throws Exception {
@@ -250,7 +345,7 @@ public class StreamsPanel extends javax.swing.JPanel {
             if (!source.isRowSelected(row)){
                 source.changeSelection(row, column, false, false);               
             }
-            String streamName = (String) source.getModel().getValueAt(row, 0);
+            String streamName = source.getModel().getValueAt(row, 0).toString();
             StreamManager streamManager = streamManagersService.getStreamManagerByName(streamName);
             if(streamManager.isRunning()){
                 startMenuItem.setEnabled(false);
@@ -267,7 +362,7 @@ public class StreamsPanel extends javax.swing.JPanel {
         int selectedRow = streamsTable.getSelectedRow();
         if(selectedRow>=0){
             TableModel model = streamsTable.getModel();
-            final String streamName = (String) model.getValueAt(selectedRow, 0);
+            final String streamName = model.getValueAt(selectedRow, 0).toString();
             final StreamManager streamManager = streamManagersService.getStreamManagerByName(streamName);
             SwingWorker worker = new SwingWorker<Void, Void>() {
                 @Override
@@ -299,12 +394,27 @@ public class StreamsPanel extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_deleteMenuItemActionPerformed
 
+    private void startButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_startButtonActionPerformed
+        startMenuItemActionPerformed(evt);
+    }//GEN-LAST:event_startButtonActionPerformed
+
+    private void deleteButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteButtonActionPerformed
+        deleteMenuItemActionPerformed(evt);
+    }//GEN-LAST:event_deleteButtonActionPerformed
+
+    private void stopButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_stopButtonActionPerformed
+        stopMenuItemActionPerformed(evt);
+    }//GEN-LAST:event_stopButtonActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton addButton;
+    private javax.swing.JButton deleteButton;
     private javax.swing.JMenuItem deleteMenuItem;
-    private javax.swing.JButton jButton1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JPopupMenu popupMenu;
+    private javax.swing.JButton startButton;
     private javax.swing.JMenuItem startMenuItem;
+    private javax.swing.JButton stopButton;
     private javax.swing.JMenuItem stopMenuItem;
     private javax.swing.JTable streamsTable;
     // End of variables declaration//GEN-END:variables

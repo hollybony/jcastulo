@@ -259,9 +259,9 @@ public class MediaQueuePanel extends javax.swing.JPanel implements StreamListene
             }
         });
         jScrollPane1.setViewportView(mediaFilesTable);
-        mediaFilesTable.getColumnModel().getColumn(0).setMinWidth(20);
-        mediaFilesTable.getColumnModel().getColumn(0).setPreferredWidth(25);
-        mediaFilesTable.getColumnModel().getColumn(0).setMaxWidth(30);
+        mediaFilesTable.getColumnModel().getColumn(0).setMinWidth(25);
+        mediaFilesTable.getColumnModel().getColumn(0).setPreferredWidth(30);
+        mediaFilesTable.getColumnModel().getColumn(0).setMaxWidth(40);
 
         addButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/add.png"))); // NOI18N
         addButton.setToolTipText("Add media files");
